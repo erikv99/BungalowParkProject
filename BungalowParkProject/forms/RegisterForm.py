@@ -6,5 +6,5 @@ class RegisterForm(FlaskForm):
     
     user_name = StringField("Username:", validators=[DataRequired(), Length(min=5, max=50)])
     password = PasswordField("Password:", validators=[DataRequired(), Length(min=8, max=50)])
-    re_enter_password = PasswordField("Re-enter password:", validators=[DataRequired(), Length(min=8, max=50)])
+    confirm_password = PasswordField("Confirm password:", validators=[DataRequired(), Length(min=8, max=50)])
     submit = SubmitField("Register")

@@ -2,10 +2,20 @@
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
+    {% include 'partials/sharedImports.html' %}
     <meta charset="utf-8" />
     <title></title>
 </head>
 <body>
+    {% include 'partials/navigation.html' %}
     <h3>Register</h3>
+    {{ form.hidden_tag() }}
+    {{ form.user_name.label }} {{ form.user_name() }}
+    <br />
+    {{ form.password.label }} {{ form.password() }}
+    <br />
+    {{ form.confirm_password.label }} {{ form.confirm_password() }}
+    <br />
+    {{ form.submit() }}
 </body>
 </html>

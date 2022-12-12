@@ -22,18 +22,28 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="errorRoutes.py" />
+    <Compile Include="dataTransferObjects\BungalowDto.py" />
+    <Compile Include="enums\MessageType.py" />
+    <Compile Include="ErrorRoutes.py" />
+    <Compile Include="forms\RegisterForm.py" />
+    <Compile Include="forms\LoginForm.py" />
     <Compile Include="main.py" />
-    <Compile Include="routes.py" />
+    <Compile Include="Routes.py" />
     <Compile Include="viewModels\IndexVM.py" />
+    <Compile Include="viewModels\MakeReservationVM.py" />
+    <Compile Include="viewModels\RegisterVM.py" />
+    <Compile Include="viewModels\LoginVM.py" />
     <Compile Include="viewModels\ViewModelBase.py" />
     <Compile Include="viewModels\__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="forms\" />
     <Folder Include="dataTransferObjects\" />
+    <Folder Include="enums\" />
     <Folder Include="static\css\" />
     <Folder Include="static\" />
+    <Folder Include="static\scripts\" />
+    <Folder Include="templates\partials\" />
     <Folder Include="viewModels\" />
     <Folder Include="templates\" />
   </ItemGroup>
@@ -49,11 +59,17 @@
     </Interpreter>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ReadMe.md" />
     <Content Include="static\css\style.css" />
     <Content Include="requirements.txt" />
+    <Content Include="templates\adminFunctions.html" />
     <Content Include="templates\error.html" />
     <Content Include="templates\index.html" />
-    <Content Include="templates\navigation.html" />
+    <Content Include="templates\login.html" />
+    <Content Include="templates\makeReservation.html" />
+    <Content Include="templates\partials\sharedImports.html" />
+    <Content Include="templates\partials\navigation.html" />
+    <Content Include="templates\register.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

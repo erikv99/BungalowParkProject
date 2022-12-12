@@ -1,5 +1,5 @@
-from BungalowParkProject.enums.MessageType import MessageType
-from BungalowParkProjectviewModels.ViewModelBase import ViewModelBase
+from ..enums.MessageType import MessageType
+from ViewModelBase import ViewModelBase
 
 class RegisterVM(ViewModelBase):
     """

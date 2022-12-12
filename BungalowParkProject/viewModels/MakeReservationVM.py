@@ -1,4 +1,4 @@
-from BungalowParkProject.viewModels.ViewModelBase import ViewModelBase
+from ..viewModels.ViewModelBase import ViewModelBase
 
 
 class MakeReservationVM(ViewModelBase):
