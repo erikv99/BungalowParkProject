@@ -1,0 +1,14 @@
+<nav class="navbar navbar-dark bg-dark">
+    <span class="navbar-brand">Zee en Duin</span>
+
+    {% if model.isAdmin %}
+    <a class="nav-link" href="#admin">Admin functions</a>
+    {% endif %}
+
+    {% if model.isLoggedIn %}
+    <a class="nav-link" href="#logout">Logout</a>
+    {% else %}
+    <a class="nav-link" href="#login">Login</a>
+    <a class="nav-link" href="#signup">Signup</a>
+    {% endif %}
+</nav>
