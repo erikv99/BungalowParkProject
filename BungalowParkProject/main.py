@@ -13,7 +13,7 @@ def main():
     # Setting the secret key
     app.config["SECRET_KEY"] = "SECRETKEY"
     
-
+    app.sess
 
     # Running the app.
     app.run(debug = True)

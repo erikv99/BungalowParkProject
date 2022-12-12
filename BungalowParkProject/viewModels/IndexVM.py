@@ -1,9 +1,10 @@
-from viewModels.ViewModelABC import ViewModelABC
+from viewModels.ViewModelBase import ViewModelBase
 
-class IndexVM():
-    
-    def __init__(self):
-        
-        self.isLoggedIn = False;
-        self.isAdmin = False;
+class IndexVM(ViewModelBase):
+    """
+        View model for the index.html view, 
+        contains all possible data which can be used to construct the view.
+    """
+    pass
+
 

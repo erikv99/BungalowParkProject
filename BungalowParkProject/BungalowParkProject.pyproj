@@ -26,7 +26,7 @@
     <Compile Include="main.py" />
     <Compile Include="routes.py" />
     <Compile Include="viewModels\IndexVM.py" />
-    <Compile Include="viewModels\ViewModelABC.py" />
+    <Compile Include="viewModels\ViewModelBase.py" />
     <Compile Include="viewModels\__init__.py" />
   </ItemGroup>
   <ItemGroup>
