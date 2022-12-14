@@ -1,14 +1,14 @@
-<!DOCTYPE html>
+{% extends "layout.html" %}
 
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    {% include 'partials/sharedImports.html' %}
-    <meta charset="utf-8" />
-    <title>Home</title>
+{% block title %}
+    Home
+{% endblock %}
 
-</head>
-<body>
-    {% include 'partials/navigation.html' %}
-    home
-</body>
-</html>
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+<h3>Home</h3>
+<p>Home page</p>
+{% endblock %}

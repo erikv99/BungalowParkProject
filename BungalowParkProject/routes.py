@@ -50,3 +50,9 @@ def reservation():
 
     model = IndexVM()
     return _render_template('login.html', model=model)
+
+@app.route("/admin", methods=["POST", "GET"])
+def admin():
+
+    model = IndexVM()
+    return _render_template('login.html', model=model)

@@ -1,10 +1,46 @@
-body
-{
-    color:blue;
+#footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    background-color: #f5f5f5;
+    color: mediumturquoise;
 }
 
-h1 
-{
-    color: blue;
+#footer a {
+    color: #4d9dc4;
 }
 
+#content-background {
+    background-color: #e5e5f7;
+    opacity: 0.8;
+    background-size: 10px 10px;
+    background-image: repeating-linear-gradient(45deg, #82838a 0, #933838 1px, #343459 0, #8a8e69 30%);
+    padding-top: 2em;
+    /*Viewheight minus header and footer size*/
+    height: calc(100vh - (40px + 66px));
+}
+
+#content {
+    background: rgba(255,255,255,0.45);
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.225);
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.navbar 
+{
+    height: 66px;
+}
+
+.navbar-brand img {
+    height: 40px;
+}
+
+.nav-item button {
+    height: 40px;
+}

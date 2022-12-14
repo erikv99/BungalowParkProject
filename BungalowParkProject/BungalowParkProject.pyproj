@@ -42,8 +42,8 @@
     <Folder Include="enums\" />
     <Folder Include="static\css\" />
     <Folder Include="static\" />
+    <Folder Include="static\img\" />
     <Folder Include="static\scripts\" />
-    <Folder Include="templates\partials\" />
     <Folder Include="viewModels\" />
     <Folder Include="templates\" />
   </ItemGroup>
@@ -62,13 +62,13 @@
     <Content Include="ReadMe.md" />
     <Content Include="static\css\style.css" />
     <Content Include="requirements.txt" />
+    <Content Include="static\img\logo.png" />
     <Content Include="templates\adminFunctions.html" />
     <Content Include="templates\error.html" />
     <Content Include="templates\index.html" />
+    <Content Include="templates\layout.html" />
     <Content Include="templates\login.html" />
     <Content Include="templates\makeReservation.html" />
-    <Content Include="templates\partials\sharedImports.html" />
-    <Content Include="templates\partials\navigation.html" />
     <Content Include="templates\register.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
