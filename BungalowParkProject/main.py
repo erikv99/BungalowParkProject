@@ -14,6 +14,10 @@ def main():
     # Setting the secret key
     app.config["SECRET_KEY"] = "SECRETKEY"
 
+    baseDir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(baseDir, 'data.sqlite')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
     # Running the app.
     app.run(debug = True)
 

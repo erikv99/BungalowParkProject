@@ -27,6 +27,7 @@
     <Compile Include="ErrorRoutes.py" />
     <Compile Include="forms\RegisterForm.py" />
     <Compile Include="forms\LoginForm.py" />
+    <Compile Include="helpers\DatabaseHelper.py" />
     <Compile Include="main.py" />
     <Compile Include="Routes.py" />
     <Compile Include="viewModels\IndexVM.py" />
@@ -40,6 +41,7 @@
     <Folder Include="forms\" />
     <Folder Include="dataTransferObjects\" />
     <Folder Include="enums\" />
+    <Folder Include="helpers\" />
     <Folder Include="static\css\" />
     <Folder Include="static\" />
     <Folder Include="static\img\" />
