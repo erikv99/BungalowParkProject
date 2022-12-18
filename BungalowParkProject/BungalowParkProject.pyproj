@@ -22,31 +22,33 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="dataTransferObjects\BungalowDto.py" />
     <Compile Include="enums\MessageType.py" />
     <Compile Include="ErrorRoutes.py" />
     <Compile Include="forms\RegisterForm.py" />
     <Compile Include="forms\LoginForm.py" />
-    <Compile Include="helpers\DatabaseHelper.py" />
     <Compile Include="main.py" />
+    <Compile Include="models\databaseModels\Bungalow.py" />
+    <Compile Include="models\databaseModels\BungalowType.py" />
+    <Compile Include="models\databaseModels\Reservation.py" />
+    <Compile Include="models\databaseModels\User.py" />
     <Compile Include="Routes.py" />
-    <Compile Include="viewModels\IndexVM.py" />
-    <Compile Include="viewModels\MakeReservationVM.py" />
-    <Compile Include="viewModels\RegisterVM.py" />
-    <Compile Include="viewModels\LoginVM.py" />
-    <Compile Include="viewModels\ViewModelBase.py" />
-    <Compile Include="viewModels\__init__.py" />
+    <Compile Include="models\viewModels\IndexVM.py" />
+    <Compile Include="models\viewModels\MakeReservationVM.py" />
+    <Compile Include="models\viewModels\RegisterVM.py" />
+    <Compile Include="models\viewModels\LoginVM.py" />
+    <Compile Include="models\viewModels\ViewModelBase.py" />
+    <Compile Include="models\viewModels\__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="forms\" />
-    <Folder Include="dataTransferObjects\" />
     <Folder Include="enums\" />
-    <Folder Include="helpers\" />
+    <Folder Include="models\databaseModels\" />
+    <Folder Include="models\" />
     <Folder Include="static\css\" />
     <Folder Include="static\" />
     <Folder Include="static\img\" />
     <Folder Include="static\scripts\" />
-    <Folder Include="viewModels\" />
+    <Folder Include="models\viewModels\" />
     <Folder Include="templates\" />
   </ItemGroup>
   <ItemGroup>

@@ -1,8 +1,10 @@
 from flask import Flask
 import os
+from flask_sqlalchemy import SQLAlchemy
 
-# Creating the Flask app and putting it in a var.
+# We want to be able to access these properties from the outside so we declare them here.
 app = Flask(__name__)
+db = SQLAlchemy(app)
 
 # Have to import these after creating the app
 # since they need app to function.
