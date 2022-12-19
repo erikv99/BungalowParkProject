@@ -19,13 +19,19 @@
     <nav class="navbar navbar-dark bg-dark">
 
         <span class="navbar-brand">
-            <img src="{{ url_for('static', filename='img/logo.png') }}" />
+            <a href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" />
+            </a>
         </span>
 
         <ul class="nav pull-right ">
         
             <li class="nav-item mr-3">
                 <a class="navbar-btn btn btn-outline-info" href="{{ url_for('index') }}"><i class="fas fa-home"> Home</i></a>
+            </li>
+
+            <li class="nav-item mr-3">
+                <a class="navbar-btn btn btn-outline-info" href="{{ url_for('reserve') }}"><i class="fas fa-utensils"> Make reservation</i></a>
             </li>
 
             {% if model.is_logged_in %}
@@ -42,7 +48,7 @@
 
             {% else %}
             <li class="nav-item mr-3">
-                <a class="navbar-btn btn btn-outline-info" href="{{ url_for('register') }}"><i class="fab fa-wpforms"> Register</i></a>
+                <a class="navbar-btn btn btn-outline-info" href="{{ url_for('register') }}"><i class="fas fa-user-plus"> Register</i></a>
 
             </li>
             <li class="nav-item mr-3">

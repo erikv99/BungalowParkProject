@@ -1,11 +1,20 @@
 from flask import render_template, session, url_for
-from models.viewModels.IndexVM import IndexVM
-from models.viewModels.ViewModelBase import ViewModelBase
 from __main__ import app
 
-# Form inputs
-from forms.LoginForm import LoginForm
-from forms.RegisterForm import RegisterForm
+# View model imports.
+from models.viewModels.indexVM import IndexVM
+from models.viewModels.loginVM import LoginVM
+from models.viewModels.registerVM import RegisterVM
+from models.viewModels.reserveVM import ReserveVM
+from models.viewModels.adminVM import AdminVM
+from models.viewModels.viewModelBase import ViewModelBase
+
+# Form imports
+from forms.reservationForm import ReservationForm
+from forms.loginForm import LoginForm
+from forms.registerForm import RegisterForm
+
+from models.databaseModels.user import User
 
 def _render_template(template_name, model = None, form = None):
     """
@@ -28,6 +37,9 @@ def _render_template(template_name, model = None, form = None):
 
 @app.route("/")
 def index():
+
+    x = User.query.all()
+    y = 4
     model = IndexVM()
     return _render_template('index.html', model=model)
 
@@ -35,24 +47,33 @@ def index():
 def login():
 
     form = LoginForm()
-    model = IndexVM()
+    model = LoginVM()
     return _render_template('login.html', model=model, form=form)
 
 @app.route("/register", methods=["POST", "GET"])
 def register():
 
     form = RegisterForm()
-    model = IndexVM()
+    model = RegisterVM()
     return _render_template('register.html', model=model, form=form)
 
-@app.route("/reservation", methods=["POST", "GET"])
-def reservation():
+@app.route("/reserve", methods=["POST", "GET"])
+def reserve():
 
-    model = IndexVM()
-    return _render_template('login.html', model=model)
+    form = ReservationForm()
+    model = ReserveVM()
+    return _render_template('reserve.html', model=model, form=form)
 
 @app.route("/admin", methods=["POST", "GET"])
 def admin():
 
-    model = IndexVM()
-    return _render_template('adminFunctions.html', model=model)
+    model = AdminVM()
+    return _render_template('admin.html', model=model)
+
+# Error routes
+
+@app.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return _render_template('error.html')
+

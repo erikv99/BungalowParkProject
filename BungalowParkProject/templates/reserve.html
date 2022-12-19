@@ -10,4 +10,12 @@
 
 {% block content %}
 <h3>Make reservation</h3>
+
+{% if not model.is_logged_in %}
+    <p>
+        In order to make a reservation you must <a href="{{ url_for('login') }}">login</a>
+    </p>
+{% else %} 
+
+{% endif %}
 {% endblock %}

@@ -1,15 +1,11 @@
-from enums.messageType import MessageType
 from .viewModelBase import ViewModelBase
+from enums.messageType import MessageType
 
-class LoginVM(ViewModelBase):
+class ReserveVM(ViewModelBase):
     """
-        View model for the login.html view, 
+        View model for the reserve.html view, 
         contains all possible data which can be used to construct the view.
     """
 
     message_type = MessageType.NONE
     message_content = ""
-
-
-
-

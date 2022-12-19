@@ -1,10 +1,8 @@
 from .viewModelBase import ViewModelBase
 
-class IndexVM(ViewModelBase):
+class AdminVM(ViewModelBase):
     """
-        View model for the index.html view, 
+        View model for the admmin.html view, 
         contains all possible data which can be used to construct the view.
     """
     pass
-
-

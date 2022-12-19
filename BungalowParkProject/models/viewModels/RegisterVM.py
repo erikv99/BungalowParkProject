@@ -1,5 +1,5 @@
-from ..enums.MessageType import MessageType
-from ViewModelBase import ViewModelBase
+from enums.messageType import MessageType
+from .viewModelBase import ViewModelBase
 
 class RegisterVM(ViewModelBase):
     """

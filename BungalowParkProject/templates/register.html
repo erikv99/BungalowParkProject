@@ -20,6 +20,8 @@
         {{ form.confirm_password(placeholder="Confirm password", class_="auth-input") }} 
         <br />
         {{ form.submit(class_="btn btn-lg btn-primary btn-block auth-submit") }}
+        <br/>
+        Already have one? <a href="{{ url_for('login') }}">Sign in here</a>
     </div>
 </div>
 {% endblock %}

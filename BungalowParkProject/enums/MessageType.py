@@ -1,8 +1,8 @@
 from enum import Enum
 
 class MessageType(Enum):
-    WARNING = "WARNING"
-    ERROR = "ERROR"
-    SUCCESS = "SUCCESS"
-    INFO = "INFO"
-    NONE = "NONE"
+    WARNING = "alert-warning"
+    ERROR = "alert-danger"
+    SUCCESS = "alert-success"
+    INFO = "alert-info"
+    NONE = ""
