@@ -1,4 +1,4 @@
-from __main__ import db
+from BungalowParkProject.main import db
 
 class Bungalow(db.Model):
     pass

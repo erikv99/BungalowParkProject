@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+{% extends "layout.html" %}
 
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    {% include 'partials/sharedImports.html' %}
-    <meta charset="utf-8" />
-    <title></title>
-</head>
-<body>
-    {% include 'partials/navigation.html' %}
-    <h3>Admin Functions</h3>
-</body>
-</html>
+{% block title %}
+    Home
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+<h3>Admin functions</h3>
+{% endblock %}

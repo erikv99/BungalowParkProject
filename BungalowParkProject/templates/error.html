@@ -1,13 +1,14 @@
-<!DOCTYPE html>
+{% extends "layout.html" %}
 
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    {% include 'partials/sharedImports.html' %}
-    <meta charset="utf-8" />
-    <title></title>
-</head>
-<body>
-    {% include 'partials/navigation.html' %}
-    <h3>Oops, something went wrong</h3>
-</body>
-</html>
+{% block title %}
+    Error
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+<h3>Error</h3>
+<p>Everything is totally fucked</p>
+{% endblock %}

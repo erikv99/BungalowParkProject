@@ -23,15 +23,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="enums\MessageType.py" />
-    <Compile Include="ErrorRoutes.py" />
     <Compile Include="forms\RegisterForm.py" />
     <Compile Include="forms\LoginForm.py" />
-    <Compile Include="main.py" />
     <Compile Include="models\databaseModels\Bungalow.py" />
     <Compile Include="models\databaseModels\BungalowType.py" />
     <Compile Include="models\databaseModels\Reservation.py" />
     <Compile Include="models\databaseModels\User.py" />
-    <Compile Include="Routes.py" />
+    <Compile Include="routes.py" />
+    <Compile Include="errorRoutes.py" />
     <Compile Include="models\viewModels\IndexVM.py" />
     <Compile Include="models\viewModels\MakeReservationVM.py" />
     <Compile Include="models\viewModels\RegisterVM.py" />
@@ -42,13 +41,13 @@
   <ItemGroup>
     <Folder Include="forms\" />
     <Folder Include="enums\" />
-    <Folder Include="models\databaseModels\" />
     <Folder Include="models\" />
     <Folder Include="static\css\" />
     <Folder Include="static\" />
     <Folder Include="static\img\" />
     <Folder Include="static\scripts\" />
     <Folder Include="models\viewModels\" />
+    <Folder Include="models\databaseModels\" />
     <Folder Include="templates\" />
   </ItemGroup>
   <ItemGroup>

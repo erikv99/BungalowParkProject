@@ -9,7 +9,7 @@
     {% block head %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href={{ url_for('static',filename='css/style.css') }}>
+    <link rel="stylesheet" href={{ url_for('static', filename='css/style.css') }}>
     <script src="https://kit.fontawesome.com/969d13854d.js" crossorigin="anonymous"></script>
     <meta charset="utf-8" />
     <title>{% block title %}{% endblock %}</title>
@@ -19,33 +19,34 @@
     <nav class="navbar navbar-dark bg-dark">
 
         <span class="navbar-brand">
-            <img src="{{ url_for('static',filename='img/logo.png') }}" />
+            <img src="{{ url_for('static', filename='img/logo.png') }}" />
         </span>
 
         <ul class="nav pull-right ">
         
             <li class="nav-item mr-3">
-                <button class="navbar-btn btn btn-outline-info" href="{{ url_for('index') }}"><i class="fas fa-home"> Home</i></button>
+                <a class="navbar-btn btn btn-outline-info" href="{{ url_for('index') }}"><i class="fas fa-home"> Home</i></a>
             </li>
 
             {% if model.is_logged_in %}
 
                 {% if model.is_admin %}
                     <li class="nav-item mr-3">
-                        <button class="navbar-btn btn btn-outline-info" href="{{ url_for('admin') }}"><i class="fas fa-user-shield">Admin functions</i></button>
+                        <a class="navbar-btn btn btn-outline-info" href="{{ url_for('admin') }}"><i class="fas fa-user-shield"> Admin functions</i></a>
                     </li>
                 {% endif %}
 
                 <li class="nav-item mr-3">
-                    <button class="navbar-btn btn btn-outline-info" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt">Logout</i></button>
+                    <a class="navbar-btn btn btn-outline-info" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"> Logout</i></a>
                 </li>
 
             {% else %}
             <li class="nav-item mr-3">
-                <button class="navbar-btn btn btn-outline-info" href="{{ url_for('register') }}"><i class="fab fa-wpforms"> Register</i></button>
+                <a class="navbar-btn btn btn-outline-info" href="{{ url_for('register') }}"><i class="fab fa-wpforms"> Register</i></a>
+
             </li>
             <li class="nav-item mr-3">
-                <button class="navbar-btn btn btn-outline-info" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> Login</i></button>
+                <a class="navbar-btn btn btn-outline-info" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"> Login</i></a>
             </li>
 
             {% endif %}

@@ -1,6 +1,6 @@
-from flask import render_template, session
-from viewModels.IndexVM import IndexVM
-from viewModels.ViewModelBase import ViewModelBase
+from flask import render_template, session, url_for
+from models.viewModels.IndexVM import IndexVM
+from models.viewModels.ViewModelBase import ViewModelBase
 from __main__ import app
 
 # Form inputs
@@ -55,4 +55,4 @@ def reservation():
 def admin():
 
     model = IndexVM()
-    return _render_template('login.html', model=model)
+    return _render_template('adminFunctions.html', model=model)

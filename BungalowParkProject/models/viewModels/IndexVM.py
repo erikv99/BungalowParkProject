@@ -1,4 +1,4 @@
-from viewModels.ViewModelBase import ViewModelBase
+from models.viewModels.ViewModelBase import ViewModelBase
 
 class IndexVM(ViewModelBase):
     """
