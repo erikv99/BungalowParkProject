@@ -9,13 +9,17 @@
 {% endblock %}
 
 {% block content %}
-<h3>Login</h3>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    {{ form.user_name.label }} {{ form.user_name() }}
-    <br />
-    {{ form.password.label }} {{ form.password() }}
-    <br />
-    {{ form.submit() }}
-</form>
+<div id="centered-content" class="p-4 p-md-5">
+    <div class="auth-container">
+        <h3>Please sign in</h3>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            {{ form.user_name(placeholder="Username", class_="auth-input") }}
+            <br />
+            {{ form.password(placeholder="Password", class_="auth-input") }} 
+            <br />
+            {{ form.submit(class_="btn btn-lg btn-primary btn-block auth-submit") }}
+        </form>
+    </div>
+</div>
 {% endblock %}

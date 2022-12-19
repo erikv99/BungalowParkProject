@@ -16,7 +16,7 @@
     background-color: #e5e5f7;
     opacity: 0.8;
     background-size: 10px 10px;
-    background-image: repeating-linear-gradient(45deg, #82838a 0, #933838 1px, #343459 0, #8a8e69 30%);
+    background-image: repeating-linear-gradient(45deg, #82838a 0, #fff 1px, #fff 0, #e7e8e0 50%);
     padding-top: 2em;
     /*Viewheight minus header and footer size*/
     height: calc(100vh - (40px + 66px));
@@ -24,10 +24,15 @@
 
 #content {
     background: rgba(255,255,255,0.45);
-    -webkit-backdrop-filter: blur(15px);
-    backdrop-filter: blur(15px);
     border: 1px solid rgba(255,255,255,0.225);
-    width: 95%;
+    width: 60vw;
+    max-width: 60vw;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#centered-content {
+    width: 50%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -43,4 +48,28 @@
 
 .nav-item button {
     height: 40px;
+}
+
+.auth-container {
+    text-align: center;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.auth-container input {
+    width: 100%;
+}
+
+.auth-submit {
+    margin-top: 10px;
+}
+
+.auth-input {
+    border: 1px solid #6b7a88;
+    color: #495057;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
