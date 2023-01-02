@@ -18,6 +18,7 @@ from forms.registerForm import RegisterForm
 from models.databaseModels.user import User
 from helpers.authHelper import AuthHelper
 
+
 def _render_template(template_name, model = None, form = None):
     """
         Renders a template with a specific model (or None)
@@ -54,7 +55,6 @@ def logout():
         AuthHelper().Logout()
         model.message_content = "You are now logged out"
         model.message_type = MessageType.SUCCESS
-
     except:
         model.message_content = "Error while trying to log out"
         model.message_type = MessageType.ERROR
@@ -93,6 +93,34 @@ def register():
 
     form = RegisterForm()
     model = RegisterVM()
+    return _render_template('register.html', model=model, form=form)
+
+@app.route("/login/register_submit", methods=["POST", "GET"])
+def register_submit():
+
+    form = RegisterForm()
+    model = RegisterVM()
+
+    if form.validate_on_submit():
+
+        username = form.data.get("user_name")
+        password = form.data.get("password")
+        confirm_password = form.data.get("confirm_password")
+
+        if (password == confirm_password):
+            
+            AuthHelper().Register(username, password)
+            model.message_type = MessageType.SUCCESS
+            model.message_content = "Registration completed"
+
+        else:
+            model.message_type = MessageType.ERROR
+            model.message_content = "Passwords do not match"
+
+    else:
+            model.message_type = MessageType.ERROR
+            model.message_content = "Error registering user"
+
     return _render_template('register.html', model=model, form=form)
 
 @app.route("/reserve", methods=["POST", "GET"])

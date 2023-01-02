@@ -18,7 +18,9 @@ import routes
 # Otherwise the db stuff wont work properly.
 @app.before_first_request
 def create_tables():
+    
     db.create_all()
+    
 
 def main():
 
@@ -30,9 +32,6 @@ def main():
 
     # Running the app.
     app.run(debug = True, use_reloader=False)
-
-    # with app.app_context():
-    #     db.create_all()
 
 if __name__ == "__main__":
     main()
