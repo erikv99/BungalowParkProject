@@ -1,5 +1,6 @@
 from flask import render_template, session, url_for
 from __main__ import app
+from enums.messageType import MessageType
 
 # View model imports.
 from models.viewModels.indexVM import IndexVM
@@ -15,6 +16,7 @@ from forms.loginForm import LoginForm
 from forms.registerForm import RegisterForm
 
 from models.databaseModels.user import User
+from helpers.authHelper import AuthHelper
 
 def _render_template(template_name, model = None, form = None):
     """
@@ -38,16 +40,52 @@ def _render_template(template_name, model = None, form = None):
 @app.route("/")
 def index():
 
-    x = User.query.all()
-    y = 4
     model = IndexVM()
     return _render_template('index.html', model=model)
+
+
+@app.route("/logout", methods=["POST", "GET"])
+def logout():
+
+    form = LoginForm()
+    model = LoginVM()
+    
+    try:
+        AuthHelper().Logout()
+        model.message_content = "You are now logged out"
+        model.message_type = MessageType.SUCCESS
+
+    except:
+        model.message_content = "Error while trying to log out"
+        model.message_type = MessageType.ERROR
+
+    return _render_template('login.html', model=model, form=form)
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
 
     form = LoginForm()
     model = LoginVM()
+    return _render_template('login.html', model=model, form=form)
+    
+
+@app.route("/login/submit", methods=["POST", "GET"])
+def login_submit():
+
+    form = LoginForm()
+    model = LoginVM()
+
+    if form.validate_on_submit(): 
+
+        username = form.data.get("user_name")
+        password = form.data.get("password")
+        model = AuthHelper().Login(username, password)
+
+    else:
+
+        model.message_type = MessageType.ERROR
+        model.message_content = "Error submitting form"
+
     return _render_template('login.html', model=model, form=form)
 
 @app.route("/register", methods=["POST", "GET"])

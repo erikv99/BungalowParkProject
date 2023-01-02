@@ -23,8 +23,8 @@
 }
 
 #content {
-    background: rgba(255,255,255,0.45);
-    border: 1px solid rgba(255,255,255,0.225);
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.225);
     width: 60vw;
     max-width: 60vw;
     margin-left: auto;
@@ -37,8 +37,7 @@
     margin-right: auto;
 }
 
-.navbar 
-{
+.navbar {
     height: 66px;
 }
 
@@ -71,5 +70,9 @@
     padding: 10px;
     font-size: 16px;
     border-radius: .25rem;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.alert p {
+    margin: 0.1em 0em;
 }

@@ -9,7 +9,3 @@ class LoginVM(ViewModelBase):
 
     message_type = MessageType.NONE
     message_content = ""
-
-
-
-

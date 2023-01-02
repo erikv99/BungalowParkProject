@@ -14,6 +14,12 @@ db = SQLAlchemy(app)
 # since they need app to function.
 import routes
 
+# Need to make sure tables get created before the first request.
+# Otherwise the db stuff wont work properly.
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
 def main():
 
     print("Main executed")
@@ -25,13 +31,13 @@ def main():
     # Running the app.
     app.run(debug = True, use_reloader=False)
 
-    with app.app_context():
-        db.create_all()
+    # with app.app_context():
+    #     db.create_all()
 
 if __name__ == "__main__":
     main()
 
 else:
-    print("F")
+    print("App was unable to launch since __name__ != __main__")
 
     
