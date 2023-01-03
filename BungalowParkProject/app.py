@@ -2,6 +2,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
 
+from helpers.populateHelper import PopulateHelper
+
 # We want to be able to access these properties from the outside so we declare them here.
 app = Flask(__name__)
 
@@ -14,21 +16,29 @@ db = SQLAlchemy(app)
 # since they need app to function.
 import routes
 
-# Need to make sure tables get created before the first request.
-# Otherwise the db stuff wont work properly.
-@app.before_first_request
-def create_tables():
-    
-    db.create_all()
-    
+# # Need to make sure tables get created before the first request.
+# # Otherwise the db stuff wont work properly.
+# @app.before_first_request
+# def create_tables():
 
 def main():
 
-    print("Main executed")
+    print("Main executed...")
 
     # Setting the secret key
     app.config["SECRET_KEY"] = "SECRETKEY"
     app.config["SESSION_COOKIE_SECURE"] = False
+
+    # We need to import these here so when creating the db
+    # the db knows how to find them.
+    from models.databaseModels.bungalow import Bungalow
+    from models.databaseModels.bungalowType import BungalowType
+    from models.databaseModels.user import User
+    from models.databaseModels.reservation import Reservation
+    db.create_all()
+
+    # Populating the db if needed
+    PopulateHelper().Populate()
 
     # Running the app.
     app.run(debug = True, use_reloader=False)

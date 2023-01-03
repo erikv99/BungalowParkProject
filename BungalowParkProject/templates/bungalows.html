@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+<h3>Make reservation</h3>
+
+{% if not model.is_logged_in %}
+    <p>
+        In order to make a reservation you must <a href="{{ url_for('login') }}">login</a>
+    </p>
+{% else %} 
+    <h4>Available bungalows</h4>
+    {% for bungalow in model.bungalows %}
+        <div class="bungalow-container">
+            <img src="{{ url_for('static', filename=bungalow.img_url) }}" />
+            <p>Id: {{bungalow.id}}</p>
+            <p>Type id: {{bungalow.type_id}}</p>
+            <p>Type id: {{bungalow.unique_name}}</p>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

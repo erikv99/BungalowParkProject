@@ -6,14 +6,14 @@ class Reservation(db.Model):
     __tablename__ = "reservations"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    bungalow_id = db.Column(db.Integer, db.ForeignKey("bungalow.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    bungalow_id = db.Column(db.Integer, db.ForeignKey("bungalows.id"), nullable=False)
     reserveration_week_number = db.Column(db.Integer, nullable=False)
 
     # omni directional relations.
     user = relationship("User", backref="reservations")
     bungalow = relationship("Bungalow", backref="reservations")
 
-    # TODO
     def __repr__(self):
-        return ""
+        return "Reservation\nid: {}\nuser_id: {}\nbungalow_id: {}\nreservation_week_number: {}" \
+            .format(self.id, self.user_id, self.bungalow_id, self.reserveration_week_number)

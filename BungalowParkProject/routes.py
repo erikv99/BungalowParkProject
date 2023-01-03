@@ -8,7 +8,11 @@ from models.viewModels.loginVM import LoginVM
 from models.viewModels.registerVM import RegisterVM
 from models.viewModels.reserveVM import ReserveVM
 from models.viewModels.adminVM import AdminVM
+from models.viewModels.bungalowsVM import BungalowsVM
 from models.viewModels.viewModelBase import ViewModelBase
+
+from models.databaseModels.bungalow import Bungalow
+from models.databaseModels.reservation import Reservation
 
 # Form imports
 from forms.reservationForm import ReservationForm
@@ -123,8 +127,20 @@ def register_submit():
 
     return _render_template('register.html', model=model, form=form)
 
-@app.route("/reserve", methods=["POST", "GET"])
-def reserve():
+@app.route("/bungalows")
+def bungalows():
+    model = BungalowsVM()
+
+    # Getting all id's of reserved bungalows using list extension on the result tuple to create a flat list
+    reserved_bungalows_ids = [tuple_entry[0] for tuple_entry in Reservation.query.with_entities(Reservation.bungalow_id).all()]
+  
+    # Getting (and assigning) all bungalows which are not reserved
+    model.bungalows = Bungalow.query.filter(Bungalow.id.not_in(reserved_bungalows_ids)).all()
+
+    return _render_template('bungalows.html', model=model)
+
+@app.route("/bungalows/reserve/<id>", methods=["POST", "GET"])
+def reserve(id):
 
     form = ReservationForm()
     model = ReserveVM()

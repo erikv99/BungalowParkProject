@@ -76,3 +76,15 @@
 .alert p {
     margin: 0.1em 0em;
 }
+
+.bungalow-container {
+
+    padding: 0.5em;
+    border: 1px dotted gray;
+}
+
+.bungalow-container img {
+
+    max-width: 200px;
+    max-height: 200px;
+}
