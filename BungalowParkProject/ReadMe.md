@@ -1,2 +1,3 @@
-File is very heavily divided.
-I personally prefer having everything very well seperated which makes later expansion/scaling easier and cleaner.
+Semester ending exam project.
+
+Goal is to make a website for a bungalow project using html, css, python w/ flask, sqlalchemy, and sqlite
