@@ -109,20 +109,16 @@
 
 .thumbnail {
     margin: 0px;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    margin-bottom: 0px;
     margin-top: 15px;
     margin-bottom: 1em;
+    padding: 0.3em;
+    padding-bottom: 1em;
     color: #17a2b8;
     background-color: transparent;
     background-image: none;
     border-color: #17a2b8;
     border: 1px solid #17a2b8;
     border-radius: 2%;
-    padding: 0.3em;
-    padding-bottom: 0.3em;
-    padding-bottom: 1em;
 }
 
 .caption {
