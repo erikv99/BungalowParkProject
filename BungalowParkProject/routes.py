@@ -42,6 +42,12 @@ def _render_template(template_name, model = None, form = None):
     else:
         return render_template(template_name, model=model)
 
+def _divide_in_trios(bungalows):
+    # Looping through a range of 0 -> len(bungalows) in steps of 3
+    # notice we use yield, this means the function is a generator and can only by iterated once. 
+    for i in range(0, len(bungalows), 3):
+        yield bungalows[i:i + 3]
+
 @app.route("/")
 def index():
 
@@ -134,8 +140,11 @@ def bungalows():
     # Getting all id's of reserved bungalows using list extension on the result tuple to create a flat list
     reserved_bungalows_ids = [tuple_entry[0] for tuple_entry in Reservation.query.with_entities(Reservation.bungalow_id).all()]
   
-    # Getting (and assigning) all bungalows which are not reserved
-    model.bungalows = Bungalow.query.filter(Bungalow.id.not_in(reserved_bungalows_ids)).all()
+    # Getting all bungalows which are not reserved
+    bungalows = Bungalow.query.filter(Bungalow.id.not_in(reserved_bungalows_ids)).all()
+
+    # Getting a list containing multiple list containing each 3 list (or the remainer)
+    model.grouped_bungalows = _divide_in_trios(bungalows)
 
     return _render_template('bungalows.html', model=model)
 

@@ -9,21 +9,36 @@
 {% endblock %}
 
 {% block content %}
-<h3>Make reservation</h3>
 
 {% if not model.is_logged_in %}
     <p>
         In order to make a reservation you must <a href="{{ url_for('login') }}">login</a>
     </p>
 {% else %} 
-    <h4>Available bungalows</h4>
-    {% for bungalow in model.bungalows %}
-        <div class="bungalow-container">
-            <img src="{{ url_for('static', filename=bungalow.img_url) }}" />
-            <p>Id: {{bungalow.id}}</p>
-            <p>Type id: {{bungalow.type_id}}</p>
-            <p>Type id: {{bungalow.unique_name}}</p>
-        </div>
-    {% endfor %}
+    <h4 class="title">Available bungalows</h4>
+
+    <div class="container bungalow-container">
+        <table>
+            {% for bungalow_group in model.grouped_bungalows %}
+                <tr>
+                    {% for bungalow in bungalow_group %}
+                    <td>
+                        <div class="col-sm">
+                            <div class="thumbnail">
+                                <!-- <img src="/w3images/lights.jpg" alt="Lights" style="width:100%"> -->
+                                <img class="img-thumbnail" src="{{ url_for('static', filename='img/' + bungalow.img_file_name) }}" />
+                                <div class="caption">
+                                        <p class="caption-text">{{bungalow.unique_name}} (Id: {{bungalow.id}}) (Type Id: {{bungalow.type_id}})</p>
+                                        <a class="navbar-btn btn btn-outline-info" href="{{ url_for('login') }}"><i class="fas fa-plane"> Reserve</i></a>
+                                </div>
+                            </div>
+                        </div>  
+                    </td>
+                {% endfor %}
+                </tr>
+
+            {% endfor %}
+        </table>
+    </div>  
 {% endif %}
 {% endblock %}

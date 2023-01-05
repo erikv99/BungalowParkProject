@@ -6,4 +6,5 @@ class BungalowsVM(ViewModelBase):
         contains all possible data which can be used to construct the view.
     """
 
-    bungalows = []
+    # Bungalows are grouped by 3 for ease of displaying.
+    grouped_bungalows = []

@@ -1,10 +1,10 @@
-from __main__ import db
+from app import db
 
 class PopulateHelper():
 
     def Populate(self):
         """
-            Will populate the database with initial values needed for funcitoning.
+            Will populate the database with initial values needed for functioning.
         """
 
         self._populate_bungalow_types()

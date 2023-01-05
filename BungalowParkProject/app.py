@@ -2,8 +2,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
 
-from helpers.populateHelper import PopulateHelper
-
 # We want to be able to access these properties from the outside so we declare them here.
 app = Flask(__name__)
 
@@ -38,6 +36,7 @@ def main():
     db.create_all()
 
     # Populating the db if needed
+    from helpers.populateHelper import PopulateHelper
     PopulateHelper().Populate()
 
     # Running the app.
