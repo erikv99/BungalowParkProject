@@ -32,7 +32,7 @@ class PopulateHelper():
         """
             Makes sure that on first creation of the db the available bungalow types are populated.
 
-            Note: at one point the creation of new available bungalows will become responsibility of admins.
+            Note: maybe at one point the creation of new available bungalows will become responsibility of admins.
         """
 
         from models.databaseModels.bungalow import Bungalow
@@ -44,12 +44,12 @@ class PopulateHelper():
 
             bugalows = \
                 [\
-                Bungalow(type_id=1, unique_name="Sea side small",  img_file_name="bungalow_01.jpg"),\
-                Bungalow(type_id=1, unique_name="Mountain side small",  img_file_name="bungalow_02.jpg"),\
-                Bungalow(type_id=2, unique_name="Sea side medium",  img_file_name="bungalow_03.jpg"),\
-                Bungalow(type_id=2, unique_name="Mountain side medium",  img_file_name="bungalow_04.jpg"),\
-                Bungalow(type_id=3, unique_name="Sea side large",  img_file_name="bungalow_05.jpg"),\
-                Bungalow(type_id=3, unique_name="Mountain side large",  img_file_name="bungalow_06.jpg"),\
+                    Bungalow(type_id=1, unique_name="Sea side small",  img_file_name="bungalow_01.jpg"),\
+                    Bungalow(type_id=1, unique_name="Mountain side small",  img_file_name="bungalow_02.jpg"),\
+                    Bungalow(type_id=2, unique_name="Sea side medium",  img_file_name="bungalow_03.jpg"),\
+                    Bungalow(type_id=2, unique_name="Mountain side medium",  img_file_name="bungalow_04.jpg"),\
+                    Bungalow(type_id=3, unique_name="Sea side large",  img_file_name="bungalow_05.jpg"),\
+                    Bungalow(type_id=3, unique_name="Mountain side large",  img_file_name="bungalow_06.jpg"),\
                 ]
 
             db.session.add_all(bugalows)

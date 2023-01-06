@@ -1,4 +1,4 @@
-from flask import render_template, session, url_for
+from flask import render_template, session
 from __main__ import app
 from enums.messageType import MessageType
 
@@ -11,6 +11,7 @@ from models.viewModels.adminVM import AdminVM
 from models.viewModels.bungalowsVM import BungalowsVM
 from models.viewModels.viewModelBase import ViewModelBase
 
+# Database model imports.
 from models.databaseModels.bungalow import Bungalow
 from models.databaseModels.reservation import Reservation
 
@@ -34,8 +35,8 @@ def _render_template(template_name, model = None, form = None):
         model = ViewModelBase()
 
     # Checking if user is logged in and if user is an admin
-    model.is_logged_in = session.get("is_logged_in") == True
-    model.is_admin = session.get("is_admin") == True
+    model.is_logged_in = session.get("is_logged_in") #== True
+    model.is_admin = session.get("is_admin") # == True
 
     if form is not None:
         return render_template(template_name, model=model, form=form)
@@ -53,7 +54,6 @@ def index():
 
     model = IndexVM()
     return _render_template('index.html', model=model)
-
 
 @app.route("/logout", methods=["POST", "GET"])
 def logout():
@@ -124,6 +124,7 @@ def register_submit():
             model.message_content = "Registration completed"
 
         else:
+
             model.message_type = MessageType.ERROR
             model.message_content = "Passwords do not match"
 
