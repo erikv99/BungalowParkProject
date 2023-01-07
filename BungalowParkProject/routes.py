@@ -13,6 +13,7 @@ from models.viewModels.viewModelBase import ViewModelBase
 
 # Database model imports.
 from models.databaseModels.bungalow import Bungalow
+from models.databaseModels.bungalowType import BungalowType
 from models.databaseModels.reservation import Reservation
 
 # Form imports
@@ -49,6 +50,7 @@ def _divide_in_trios(bungalows):
     for i in range(0, len(bungalows), 3):
         yield bungalows[i:i + 3]
 
+@app.route("/home")
 @app.route("/")
 def index():
 
@@ -149,11 +151,29 @@ def bungalows():
 
     return _render_template('bungalows.html', model=model)
 
-@app.route("/bungalows/reserve/<id>", methods=["POST", "GET"])
-def reserve(id):
+@app.route("/reserve/<bungalow_id>", methods=["POST", "GET"])
+def reserve(bungalow_id):
 
-    form = ReservationForm()
+    bungalow = Bungalow.query.filter(Bungalow.id == bungalow_id).first()
     model = ReserveVM()
+    form = ReservationForm()
+
+    if bungalow == None:
+
+        model.message_type = MessageType.ERROR
+        model.message_content = "Error retrieving bungalow from the database with id: " + bungalow_id
+        return _render_template('reserve.html', model=model, form=form)
+    
+    bungalow_type = BungalowType.query.filter(BungalowType.id == bungalow.type_id).first()
+
+    if bungalow_type == None: 
+
+        model.message_type = MessageType.ERROR
+        model.message_content = "Error retrieving bungalow_type from the database for bungalow with id: " + bungalow_id
+        return _render_template('reserve.html', model=model, form=form)
+
+    model.bungalow = bungalow
+    model.bungalow_type = bungalow_type
     return _render_template('reserve.html', model=model, form=form)
 
 @app.route("/admin", methods=["POST", "GET"])

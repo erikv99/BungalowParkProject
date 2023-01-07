@@ -9,3 +9,6 @@ class ReserveVM(ViewModelBase):
 
     message_type = MessageType.NONE
     message_content = ""
+    bungalow = None
+    bungalow_type = None
+

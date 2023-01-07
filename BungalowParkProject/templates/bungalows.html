@@ -29,7 +29,7 @@
                                 <img class="img-thumbnail" src="{{ url_for('static', filename='img/' + bungalow.img_file_name) }}" />
                                 <div class="caption">
                                         <p class="caption-text">{{bungalow.unique_name}} (Id: {{bungalow.id}}) (Type Id: {{bungalow.type_id}})</p>
-                                        <a class="navbar-btn btn btn-outline-info" href="{{ url_for('login') }}"><i class="fas fa-plane"> Reserve</i></a>
+                                        <a class="navbar-btn btn btn-outline-info" href="{{ url_for('reserve', bungalow_id=bungalow.id) }}"><i class="fas fa-plane"> See more</i></a>
                                 </div>
                             </div>
                         </div>  
