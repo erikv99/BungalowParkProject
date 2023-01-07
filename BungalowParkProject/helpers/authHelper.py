@@ -11,18 +11,20 @@ class AuthHelper():
 
         session["is_logged_in"] = False
         session["is_admin"] = False
+        session["user_id"] = -1
 
-    def Login(self, user_name, password):
+    def Login(self, username, password):
 
         model = LoginVM()
 
         # Checking if pass hash matches the one in the db.
-        if self._pass_matches(user_name, password):
+        if self._pass_matches(username, password):
 
             session["is_logged_in"] = True
+            session["user_id"] = self._get_user_id(username)
             
             # Checking if user is admin
-            if self._is_admin(user_name):
+            if self._is_admin(username):
 
                 session["is_admin"] = True
                 model.message_content = "Admin login succesfull"
@@ -52,6 +54,10 @@ class AuthHelper():
         user = User(username=username, password=hashed_password, admin=False)
         db.session.add(user)
         db.session.commit()
+
+    def _get_user_id(self, username):
+
+        return User.query.where(User.username == username).first()
 
     def _pass_matches(self, username, password):
         """

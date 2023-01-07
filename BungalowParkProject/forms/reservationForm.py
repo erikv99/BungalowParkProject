@@ -1,10 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField
+from wtforms import SubmitField, DateField, HiddenField
 from wtforms.validators import DataRequired, Length
 
 class ReservationForm(FlaskForm):
     
-    user_name = StringField("Username:", validators=[DataRequired(), Length(min=5, max=50)])
-    password = PasswordField("Password:", validators=[DataRequired(), Length(min=8, max=50)])
-    confirm_password = PasswordField("Confirm password:", validators=[DataRequired(), Length(min=8, max=50)])
-    submit = SubmitField("Register")
+    bungalow_id = HiddenField(validators=[DataRequired()])
+    date = DateField("Reservation date: ", validators=[DataRequired()])
+    submit = SubmitField("Book")

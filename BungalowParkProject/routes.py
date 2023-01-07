@@ -1,5 +1,6 @@
 from flask import render_template, session
-from __main__ import app
+from sqlalchemy import func
+from __main__ import app, db
 from enums.messageType import MessageType
 
 # View model imports.
@@ -23,6 +24,7 @@ from forms.registerForm import RegisterForm
 
 from models.databaseModels.user import User
 from helpers.authHelper import AuthHelper
+from helpers.reservationHelper import ReservationHelper
 
 
 def _render_template(template_name, model = None, form = None):
@@ -36,19 +38,24 @@ def _render_template(template_name, model = None, form = None):
         model = ViewModelBase()
 
     # Checking if user is logged in and if user is an admin
-    model.is_logged_in = session.get("is_logged_in") #== True
-    model.is_admin = session.get("is_admin") # == True
+    model.is_logged_in = session.get("is_logged_in")
+    model.is_admin = session.get("is_admin")
+    model.user_id = session.get("user_id")
 
     if form is not None:
         return render_template(template_name, model=model, form=form)
     else:
         return render_template(template_name, model=model)
 
-def _divide_in_trios(bungalows):
-    # Looping through a range of 0 -> len(bungalows) in steps of 3
-    # notice we use yield, this means the function is a generator and can only by iterated once. 
-    for i in range(0, len(bungalows), 3):
-        yield bungalows[i:i + 3]
+def _add_message(model, message_type, error_message):
+    """
+        Adds message a of the given type to the given model and returns it.
+        Meant to bring down the clutteryness in the file.
+    """
+
+    model.message_type = message_type
+    model.message_content = error_message
+    return model
 
 @app.route("/home")
 @app.route("/")
@@ -65,11 +72,9 @@ def logout():
     
     try:
         AuthHelper().Logout()
-        model.message_content = "You are now logged out"
-        model.message_type = MessageType.SUCCESS
+        model = _add_message(model, MessageType.SUCCESS, "You are now logged out")
     except:
-        model.message_content = "Error while trying to log out"
-        model.message_type = MessageType.ERROR
+        model = _add_message(model, MessageType.ERROR, "Error while trying to log out")
 
     return _render_template('login.html', model=model, form=form)
 
@@ -92,11 +97,9 @@ def login_submit():
         username = form.data.get("user_name")
         password = form.data.get("password")
         model = AuthHelper().Login(username, password)
-
     else:
 
-        model.message_type = MessageType.ERROR
-        model.message_content = "Error submitting form"
+        model = _add_message(model, MessageType.ERROR, "Error submitting form")
 
     return _render_template('login.html', model=model, form=form)
 
@@ -122,33 +125,19 @@ def register_submit():
         if (password == confirm_password):
             
             AuthHelper().Register(username, password)
-            model.message_type = MessageType.SUCCESS
-            model.message_content = "Registration completed"
+            model = _add_message(model, MessageType.SUCCESS, "Registration completed")
 
         else:
-
-            model.message_type = MessageType.ERROR
-            model.message_content = "Passwords do not match"
-
+             model = _add_message(model, MessageType.ERROR, "Passwords do not match")
     else:
-            model.message_type = MessageType.ERROR
-            model.message_content = "Error registering user"
+        model = _add_message(model, MessageType.ERROR, "Error registering user")
 
     return _render_template('register.html', model=model, form=form)
 
 @app.route("/bungalows")
 def bungalows():
     model = BungalowsVM()
-
-    # Getting all id's of reserved bungalows using list extension on the result tuple to create a flat list
-    reserved_bungalows_ids = [tuple_entry[0] for tuple_entry in Reservation.query.with_entities(Reservation.bungalow_id).all()]
-  
-    # Getting all bungalows which are not reserved
-    bungalows = Bungalow.query.filter(Bungalow.id.not_in(reserved_bungalows_ids)).all()
-
-    # Getting a list containing multiple list containing each 3 list (or the remainer)
-    model.grouped_bungalows = _divide_in_trios(bungalows)
-
+    model.grouped_bungalows = ReservationHelper().GetGroupedBungalows()
     return _render_template('bungalows.html', model=model)
 
 @app.route("/reserve/<bungalow_id>", methods=["POST", "GET"])
@@ -160,20 +149,88 @@ def reserve(bungalow_id):
 
     if bungalow == None:
 
-        model.message_type = MessageType.ERROR
-        model.message_content = "Error retrieving bungalow from the database with id: " + bungalow_id
+        model = _add_message(model, MessageType.ERROR, "Error retrieving bungalow from the database with id: " + bungalow_id)
         return _render_template('reserve.html', model=model, form=form)
     
     bungalow_type = BungalowType.query.filter(BungalowType.id == bungalow.type_id).first()
 
     if bungalow_type == None: 
 
-        model.message_type = MessageType.ERROR
-        model.message_content = "Error retrieving bungalow_type from the database for bungalow with id: " + bungalow_id
+        model = _add_message(model, MessageType.ERROR, "Error retrieving bungalow_type from the database for bungalow with id: " + bungalow_id)
         return _render_template('reserve.html', model=model, form=form)
 
+    form.bungalow_id.data = bungalow_id
     model.bungalow = bungalow
     model.bungalow_type = bungalow_type
+    return _render_template('reserve.html', model=model, form=form)
+
+@app.route("/reserve/commit", methods=["POST", "GET"])
+def reserve_submit():
+
+    model = ReserveVM()
+    form = ReservationForm()
+    bungalow_id = form.data.get("bungalow_id")
+    date = form.data.get("date")
+
+    # If form invalid returning a view with a error message.
+    if not form.validate_on_submit():
+
+        model = _add_message(model, MessageType.ERROR, "Error making reservation")
+
+        # if valid bungalow_id or date was given we want to make sure those are still filled in.
+        if (bungalow_id != None or bungalow_id != ""):
+            form.bungalow_id.data = bungalow_id
+
+        if (date != None or date != ""):
+            form.date.data = date
+        
+        return _render_template('reserve.html', model=model, form=form)
+
+    # If form valid but bungalow_id or date is not.
+    if (bungalow_id == None or date == None or bungalow_id == "" or date == ""):
+
+        model = _add_message(model, MessageType.ERROR, "Error making reservation")
+        return _render_template('reserve.html', model=model, form=form)
+
+    ##week_number = ReservationHelper().GetWeekNumber()'
+    week_number = 1
+
+    # Checking if bungalow is not already reserved
+    alreadyReserved = db.session.query(func.count(Reservation.id)) \
+        .where(Reservation.bungalow_id == bungalow_id and Reservation.reserveration_week_number == week_number) \
+        .first()[0] > 0
+
+    if alreadyReserved:
+
+        model = _add_message(model, MessageType.ERROR, "Bungalow is already reserved")
+        return _render_template('reserve.html', model=model, form=form)
+
+    bungalow = Bungalow.query.filter(Bungalow.id == bungalow_id).first()
+
+    if bungalow == None:
+
+        model = _add_message(model, MessageType.ERROR, "Error retrieving bungalow from the database with id: " + bungalow_id + "\nReservation failed.")
+        return _render_template('reserve.html', model=model, form=form)
+    
+    bungalow_type = BungalowType.query.filter(BungalowType.id == bungalow.type_id).first()
+
+    if bungalow_type == None: 
+
+        model = _add_message(model, MessageType.ERROR, "Error retrieving bungalow_type from the database for bungalow with id: " + bungalow_id + "\nReservation failed")
+        return _render_template('reserve.html', model=model, form=form)
+
+    #Creating a new Reservation object, then adding and commiting it to the db.
+    reservation = Reservation(user_id=username, bungalow_id=hashed_password, reserveration_week_number=False)
+    db.session.add(reservation)
+    db.session.commit()
+
+    model.message_type = MessageType.SUCCESS
+    model.message_content = "Reservation succesfull"
+    _add_message(model, MessageType.ERROR, "Error making reservation")
+    model.bungalow = bungalow
+    model.bungalow_type = bungalow_type
+    form.date.data = date
+    form.bungalow_id.data = bungalow_id
     return _render_template('reserve.html', model=model, form=form)
 
 @app.route("/admin", methods=["POST", "GET"])

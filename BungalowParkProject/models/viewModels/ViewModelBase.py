@@ -7,3 +7,4 @@ class ViewModelBase():
 
     is_admin = False;
     is_logged_in = False;
+    user_id = -1

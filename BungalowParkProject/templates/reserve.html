@@ -18,6 +18,12 @@
 
 <h3>Make reservation</h3>
 
+{% if model.message_content != "" and model.message_type.value != "" %}
+<div class="alert {{model.message_type.value}}">
+    <p>{{model.message_content}}</p>
+</div>
+{% endif %}
+
 {% if not model.is_logged_in %}
     <p>
         In order to make a reservation you must <a href="{{ url_for('login') }}">login</a>
@@ -36,6 +42,12 @@
                                 Weekprice: {{model.bungalow_type.week_price}}
                             </p>
                         {% endif %}
+                        <form method="POST" action="{{ url_for('reserve_submit') }}">
+                            {{ form.hidden_tag() }}
+                            {{ form.date() }} 
+                            <br />
+                            {{ form.submit(class_="btn btn-lg btn-primary btn-block auth-submit") }}
+                        </form>
                         
                 </div>
             </div>
