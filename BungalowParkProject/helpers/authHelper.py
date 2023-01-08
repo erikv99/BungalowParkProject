@@ -57,7 +57,8 @@ class AuthHelper():
 
     def _get_user_id(self, username):
 
-        return User.query.where(User.username == username).first()
+        user = User.query.where(User.username == username).first()
+        return user.id
 
     def _pass_matches(self, username, password):
         """
@@ -66,7 +67,7 @@ class AuthHelper():
         """
 
         # Getting the first user with the given username
-        user = User.query.filter_by(username=username).first()
+        user = User.query.where(User.username == username).first()
 
         # output is false if user is none
         if user is None:

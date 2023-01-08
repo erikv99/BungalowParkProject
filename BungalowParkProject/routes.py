@@ -10,12 +10,16 @@ from models.viewModels.registerVM import RegisterVM
 from models.viewModels.reserveVM import ReserveVM
 from models.viewModels.adminVM import AdminVM
 from models.viewModels.bungalowsVM import BungalowsVM
+from models.viewModels.myReservationsVM import MyReservationVM
 from models.viewModels.viewModelBase import ViewModelBase
 
 # Database model imports.
 from models.databaseModels.bungalow import Bungalow
 from models.databaseModels.bungalowType import BungalowType
 from models.databaseModels.reservation import Reservation
+
+
+from models.dataTransferObjects.reservationBungalowDto import ReservationBungalowDto
 
 # Form imports
 from forms.reservationForm import ReservationForm
@@ -137,7 +141,14 @@ def register_submit():
 @app.route("/bungalows")
 def bungalows():
     model = BungalowsVM()
-    model.grouped_bungalows = ReservationHelper().GetGroupedBungalows()
+
+    # Getting all id's of reserved bungalows using list extension on the result tuple to create a flat list
+    reserved_bungalows_ids = [tuple_entry[0] for tuple_entry in Reservation.query.with_entities(Reservation.bungalow_id).all()]
+    
+    # Getting all bungalows which are not reserved
+    bungalows = Bungalow.query.filter(Bungalow.id.not_in(reserved_bungalows_ids)).all()
+
+    model.grouped_bungalows = ReservationHelper().GetGroupedBungalows(bungalows)
     return _render_template('bungalows.html', model=model)
 
 @app.route("/reserve/<bungalow_id>", methods=["POST", "GET"])
@@ -193,7 +204,7 @@ def reserve_submit():
         return _render_template('reserve.html', model=model, form=form)
 
     ##week_number = ReservationHelper().GetWeekNumber()'
-    week_number = 1
+    week_number = ReservationHelper().GetWeekNumber(date)
 
     # Checking if bungalow is not already reserved
     alreadyReserved = db.session.query(func.count(Reservation.id)) \
@@ -219,19 +230,53 @@ def reserve_submit():
         model = _add_message(model, MessageType.ERROR, "Error retrieving bungalow_type from the database for bungalow with id: " + bungalow_id + "\nReservation failed")
         return _render_template('reserve.html', model=model, form=form)
 
-    #Creating a new Reservation object, then adding and commiting it to the db.
-    reservation = Reservation(user_id=username, bungalow_id=hashed_password, reserveration_week_number=False)
+    # Creating a new Reservation object, then adding and commiting it to the db.
+    reservation = Reservation(user_id=session["user_id"], bungalow_id=bungalow_id, reserveration_week_number=week_number)
     db.session.add(reservation)
     db.session.commit()
 
-    model.message_type = MessageType.SUCCESS
-    model.message_content = "Reservation succesfull"
-    _add_message(model, MessageType.ERROR, "Error making reservation")
+    _add_message(model, MessageType.SUCCESS, "Reservation succesfull")
     model.bungalow = bungalow
     model.bungalow_type = bungalow_type
     form.date.data = date
     form.bungalow_id.data = bungalow_id
     return _render_template('reserve.html', model=model, form=form)
+
+@app.route("/my_reservations", methods=["POST", "GET"])
+def my_reservations():
+
+    reservations = Reservation.query.filter(Reservation.user_id == session["user_id"]).all()
+    model = MyReservationVM()
+
+    if len(reservations) == 0:
+
+        model = _add_message(model, MessageType.INFO, "You have no reservations")
+        return _render_template('myReservations.html', model=model)
+
+    bungalows = []
+
+    for reservation in reservations:
+
+        reservation_bungalow_dto = ReservationBungalowDto()
+        reservation_bungalow_dto.id = reservation.bungalow.id
+        reservation_bungalow_dto.img_file_name = reservation.bungalow.img_file_name
+        reservation_bungalow_dto.type = reservation.bungalow.type
+        reservation_bungalow_dto.type_id = reservation.bungalow.type_id
+        reservation_bungalow_dto.unique_name = reservation.bungalow.unique_name
+        reservation_bungalow_dto.reservation_id = reservation.id
+        bungalows.append(reservation_bungalow_dto)
+
+    model.grouped_bungalows = ReservationHelper().GetGroupedBungalows(bungalows)
+    return _render_template('myReservations.html', model=model)
+
+@app.route("/cancel/<reservation_id>")
+def cancel(reservation_id):
+
+    # all we have to do is delete te reservation and return the my_reservation view basically.
+    Reservation.query.filter(Reservation.id == reservation_id).delete()
+    db.session.commit()
+
+    return my_reservations()
 
 @app.route("/admin", methods=["POST", "GET"])
 def admin():

@@ -32,7 +32,6 @@
     {% if model.bungalow != None %}
         <div class="col-sm">
             <div class="thumbnail reserve-thumbnail">
-                <!-- <img src="/w3images/lights.jpg" alt="Lights" style="width:100%"> -->
                 <img class="img-thumbnail reserve-img-thumbnail" src="{{ url_for('static', filename='img/' + model.bungalow.img_file_name) }}" />
                 <div class="caption reserve-caption">
                         <p class="">{{model.bungalow.unique_name}}</p>

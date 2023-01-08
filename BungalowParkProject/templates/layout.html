@@ -36,7 +36,7 @@
             </li>
 
             <li class="nav-item mr-3">
-                <a class="navbar-btn btn btn-outline-info" href="{{ url_for('bungalows') }}"><i class="fas fa-island-tropical"> Bungalows</i></a>
+                <a class="navbar-btn btn btn-outline-info" href="{{ url_for('bungalows') }}"><i class="fas fa-map-pin"> Bungalows</i></a>
             </li>
 
             {% if model.is_logged_in %}
@@ -46,6 +46,10 @@
                         <a class="navbar-btn btn btn-outline-info" href="{{ url_for('admin') }}"><i class="fas fa-user-shield"> Admin functions</i></a>
                     </li>
                 {% endif %}
+
+                <li class="nav-item mr-3">
+                    <a class="navbar-btn btn btn-outline-info" href="{{ url_for('my_reservations') }}"><i class="fas fa-receipt"> My reservations</i></a>
+                </li>
 
                 <li class="nav-item mr-3">
                     <a class="navbar-btn btn btn-outline-info" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"> Logout</i></a>
