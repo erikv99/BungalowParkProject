@@ -75,9 +75,12 @@ def logout():
     model = LoginVM()
     
     try:
+
         AuthHelper().Logout()
         model = _add_message(model, MessageType.SUCCESS, "You are now logged out")
+
     except:
+
         model = _add_message(model, MessageType.ERROR, "Error while trying to log out")
 
     return _render_template('login.html', model=model, form=form)
@@ -101,6 +104,7 @@ def login_submit():
         username = form.data.get("user_name")
         password = form.data.get("password")
         model = AuthHelper().Login(username, password)
+
     else:
 
         model = _add_message(model, MessageType.ERROR, "Error submitting form")
@@ -127,13 +131,16 @@ def register_submit():
         confirm_password = form.data.get("confirm_password")
 
         if (password == confirm_password):
-            
+
             AuthHelper().Register(username, password)
             model = _add_message(model, MessageType.SUCCESS, "Registration completed")
-
+        
         else:
+
              model = _add_message(model, MessageType.ERROR, "Passwords do not match")
+    
     else:
+        
         model = _add_message(model, MessageType.ERROR, "Error registering user")
 
     return _render_template('register.html', model=model, form=form)
@@ -203,7 +210,7 @@ def reserve_submit():
         model = _add_message(model, MessageType.ERROR, "Error making reservation")
         return _render_template('reserve.html', model=model, form=form)
 
-    ##week_number = ReservationHelper().GetWeekNumber()'
+    # Getting the weeknumber for the reservation
     week_number = ReservationHelper().GetWeekNumber(date)
 
     # Checking if bungalow is not already reserved
@@ -211,22 +218,22 @@ def reserve_submit():
         .where(Reservation.bungalow_id == bungalow_id and Reservation.reserveration_week_number == week_number) \
         .first()[0] > 0
 
+    # If already reserved rendering the view with a error message.
     if alreadyReserved:
-
         model = _add_message(model, MessageType.ERROR, "Bungalow is already reserved")
         return _render_template('reserve.html', model=model, form=form)
 
+    # Trying to get the bungalow of the reservation, error message if not found
     bungalow = Bungalow.query.filter(Bungalow.id == bungalow_id).first()
 
     if bungalow == None:
-
         model = _add_message(model, MessageType.ERROR, "Error retrieving bungalow from the database with id: " + bungalow_id + "\nReservation failed.")
         return _render_template('reserve.html', model=model, form=form)
     
+    # Trying to get bungalow type of reservation bungalow, error message if not found
     bungalow_type = BungalowType.query.filter(BungalowType.id == bungalow.type_id).first()
 
     if bungalow_type == None: 
-
         model = _add_message(model, MessageType.ERROR, "Error retrieving bungalow_type from the database for bungalow with id: " + bungalow_id + "\nReservation failed")
         return _render_template('reserve.html', model=model, form=form)
 
@@ -245,16 +252,20 @@ def reserve_submit():
 @app.route("/my_reservations", methods=["POST", "GET"])
 def my_reservations():
 
+    # Loading all reservations for the logged in user from the database.
     reservations = Reservation.query.filter(Reservation.user_id == session["user_id"]).all()
     model = MyReservationVM()
 
+    # If the user has no reservation we send a message informing them
     if len(reservations) == 0:
 
         model = _add_message(model, MessageType.INFO, "You have no reservations")
         return _render_template('myReservations.html', model=model)
 
-    bungalows = []
+    bungalowDtos = []
 
+    # Each bungalow here is a data transfer object which has a slight modification on the the original bungalow database model,
+    # Reason for this is we need the reservation id for each displayed bungalow so we can use cancel functionalitity
     for reservation in reservations:
 
         reservation_bungalow_dto = ReservationBungalowDto()
@@ -264,9 +275,10 @@ def my_reservations():
         reservation_bungalow_dto.type_id = reservation.bungalow.type_id
         reservation_bungalow_dto.unique_name = reservation.bungalow.unique_name
         reservation_bungalow_dto.reservation_id = reservation.id
-        bungalows.append(reservation_bungalow_dto)
+        bungalowDtos.append(reservation_bungalow_dto)
 
-    model.grouped_bungalows = ReservationHelper().GetGroupedBungalows(bungalows)
+    # Making sure the bungalow dto's are grouped by groups of 3 for displaying purposes.
+    model.grouped_bungalows = ReservationHelper().GetGroupedBungalows(bungalowDtos)
     return _render_template('myReservations.html', model=model)
 
 @app.route("/cancel/<reservation_id>")
@@ -288,6 +300,7 @@ def admin():
 
 @app.errorhandler(404)
 def page_not_found(e):
+    
     # note that we set the 404 status explicitly
     return _render_template('error.html')
 
