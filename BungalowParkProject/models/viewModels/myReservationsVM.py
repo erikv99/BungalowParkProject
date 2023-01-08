@@ -9,7 +9,5 @@ class MyReservationVM(ViewModelBase):
 
     # reserverd bungalows are grouped by 3 for ease of displaying.
     grouped_bungalows = []
-    has_reservations = True
-    reservation_ids = {}
     message_type = MessageType.NONE
     message_content = ""
