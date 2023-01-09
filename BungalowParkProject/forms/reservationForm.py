@@ -5,5 +5,5 @@ from wtforms.validators import DataRequired, Length
 class ReservationForm(FlaskForm):
     
     bungalow_id = HiddenField(validators=[DataRequired()])
-    date = DateField("Reservation date: ", validators=[DataRequired()])
+    date = DateField("Reservation week: ", validators=[DataRequired()])
     submit = SubmitField("Book")

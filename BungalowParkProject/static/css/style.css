@@ -163,3 +163,9 @@
     margin-left: auto;
     margin-right: auto;
 }
+
+.my-reservation-button {
+
+    width: 80%;
+    text-align: left;
+}

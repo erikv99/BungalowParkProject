@@ -248,19 +248,18 @@ def reserve_submit():
     form.bungalow_id.data = bungalow_id
     return _render_template('reserve.html', model=model, form=form)
 
-@app.route("/my_reservations", methods=["POST", "GET"])
-def my_reservations():
+def _get_reservations():
+    """
+        Returns a list containing all reservations for the current logged in user.
+    """
 
-    # Loading all reservations for the logged in user from the database.
-    reservations = Reservation.query.filter(Reservation.user_id == session["user_id"]).all()
-    model = MyReservationVM()
+    return Reservation.query.filter(Reservation.user_id == session["user_id"]).all()
 
-    # If the user has no reservation we send a message informing them
-    if len(reservations) == 0:
-
-        model = _add_message(model, MessageType.INFO, "You have no reservations")
-        return _render_template('myReservations.html', model=model)
-
+def _get_grouped_bungalows(reservations):
+    """
+        Returns the grouped (by 3) list of bungalowDto's
+        Used to build the view for the myReservations.html view
+    """
     bungalowDtos = []
 
     # Each bungalow here is a data transfer object which has a slight modification on the the original bungalow database model,
@@ -278,7 +277,80 @@ def my_reservations():
         bungalowDtos.append(reservation_bungalow_dto)
 
     # Making sure the bungalow dto's are grouped by groups of 3 for displaying purposes.
-    model.grouped_bungalows = ReservationHelper().GetGroupedBungalows(bungalowDtos)
+    return ReservationHelper().GetGroupedBungalows(bungalowDtos)
+
+@app.route("/extend/<reservation_id>/<direction_forward>", )
+def extend(reservation_id, direction_forward):
+
+    model = MyReservationVM()
+    reservation = Reservation.query.where(Reservation.id == reservation_id).first()
+
+    # Getting the default grouped bungelows, this means that the 'extended' reservation is not present yet.
+    # Reason we get this now is that we can just return the view with the error message when required.
+    model.grouped_bungalows = _get_grouped_bungalows(_get_reservations())
+
+    if reservation == None:
+
+        model = _add_message(model, MessageType.ERROR, "Extending reservation failed, reservation number invalid")
+        return _render_template('myReservations.html', model=model)
+
+    required_week_number = None
+    
+    # Getting the week number of the week which would be the extension
+    if direction_forward == 'True':
+
+        required_week_number = reservation.reserveration_week_number + 1
+
+        # From dec to januarie we switch from 52 to 1
+        if (required_week_number > 52):
+            required_week_number = 1
+
+    else:
+    
+        required_week_number = reservation.reserveration_week_number - 1
+
+        # From january to december we switch from 1 to 
+        if (required_week_number <= 0):
+            required_week_number = 52
+
+    # Checking if the required week for the extend is actually available
+    is_available = db.session.query(func.count(Reservation.id)) \
+        .where(Reservation.bungalow_id == reservation.bungalow_id) \
+        .where(Reservation.reserveration_week_number == required_week_number) \
+        .first()[0] == 0
+
+    # If the selected date and bungalow is not available we return with a message saying so
+    if not is_available:
+
+        model = _add_message(model, MessageType.ERROR, "Extending reservation failed, week " + str(required_week_number) + " is not free for selected bungalow")
+        return _render_template('myReservations.html', model=model)
+
+    # Creating a new Reservation object, then adding and commiting it to the db.
+    reservation = Reservation(user_id=session["user_id"], bungalow_id=reservation.bungalow_id, reserveration_week_number=required_week_number)
+    db.session.add(reservation)
+    db.session.commit()
+    model = _add_message(model, MessageType.SUCCESS, "Reservation extended")
+
+    # Since we were succesfull in extending the reservation we have to reload all this in order to 
+    # get accurate results (remember we just added a new entry in the db)       
+    model.grouped_bungalows = _get_grouped_bungalows(_get_reservations())
+
+    return _render_template('myReservations.html', model=model)
+
+@app.route("/my_reservations", methods=["POST", "GET"])
+def my_reservations():
+
+    # Loading all reservations for the logged in user from the database.
+    reservations = Reservation.query.filter(Reservation.user_id == session["user_id"]).all()
+    model = MyReservationVM()
+
+    # If the user has no reservation we send a message informing them
+    if len(reservations) == 0:
+
+        model = _add_message(model, MessageType.INFO, "You have no reservations")
+        return _render_template('myReservations.html', model=model)
+
+    model.grouped_bungalows = _get_grouped_bungalows(reservations)
     return _render_template('myReservations.html', model=model)
 
 @app.route("/cancel/<reservation_id>")
@@ -287,7 +359,6 @@ def cancel(reservation_id):
     # all we have to do is delete te reservation and return the my_reservation view basically.
     Reservation.query.filter(Reservation.id == reservation_id).delete()
     db.session.commit()
-
     return my_reservations()
 
 @app.route("/admin", methods=["POST", "GET"])
@@ -303,4 +374,3 @@ def page_not_found(e):
     
     # note that we set the 404 status explicitly
     return _render_template('error.html')
-

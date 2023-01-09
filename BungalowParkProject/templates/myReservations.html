@@ -10,6 +10,12 @@
 
 {% block content %}
 
+{% if model.message_content != "" and model.message_type.value != "" %}
+<div class="alert {{model.message_type.value}}">
+    <p>{{model.message_content}}</p>
+</div>
+{% endif %}
+
 {% if not model.is_logged_in %}
     <p>
         In order to make a reservation you must <a href="{{ url_for('login') }}">login</a>
@@ -29,8 +35,12 @@
                                 <div class="caption">
                                         <p class="caption-text">{{bungalow.unique_name}}</p>
                                         <p class="caption-text">Reservation for week {{bungalow.week_number}}</p>
-                                        <a class="navbar-btn btn btn-outline-info" href="{{ url_for('cancel', reservation_id=bungalow.reservation_id ) }}"><i class="fas fa-ban"> Cancel reservation</i></a>
-                                </div>
+                                        <br/>
+                                        <a class="navbar-btn btn btn-outline-info my-reservation-button" href="{{ url_for('cancel', reservation_id=bungalow.reservation_id ) }}"><i class="fas fa-ban"> Cancel reservation</i></a>
+                                        <a class="navbar-btn btn btn-outline-info my-reservation-button" href="{{ url_for('extend', reservation_id=bungalow.reservation_id, direction_forward=True ) }}"><i class="fas fa-plus"> Extend 1 week forwards</i></a>
+                                        <a class="navbar-btn btn btn-outline-info my-reservation-button" href="{{ url_for('extend', reservation_id=bungalow.reservation_id, direction_forward=False ) }}"><i class="fas fa-minus"> Extend 1 week backwards</i></a>
+                                        <a class="navbar-btn btn btn-outline-info my-reservation-button" href="{{ url_for('cancel', reservation_id=bungalow.reservation_id ) }}"><i class="fas fa-undo"> Change type</i></a>
+                                    </div>
                             </div>
                         </div>  
                     </td>

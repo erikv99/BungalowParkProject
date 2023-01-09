@@ -37,6 +37,8 @@
                         {% endif %}
                         <form method="POST" action="{{ url_for('reserve_submit') }}">
                             {{ form.hidden_tag() }}
+                            {{ form.date.label}}
+                            <br/>
                             {{ form.date() }} 
                             <br />
                             {{ form.submit(class_="btn btn-lg btn-primary btn-block auth-submit") }}
