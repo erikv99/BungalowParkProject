@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+
+{% if model.message_content != "" and model.message_type.value != "" %}
+<div class="alert {{model.message_type.value}}">
+    <p>{{model.message_content}}</p>
+</div>
+{% endif %}
+
+<h3>Access denied</h3>
+<p>You do not have permission to view this page...</p>
+
+{% endblock %}

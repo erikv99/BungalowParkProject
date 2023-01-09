@@ -39,7 +39,7 @@
                                         <a class="navbar-btn btn btn-outline-info my-reservation-button" href="{{ url_for('cancel', reservation_id=bungalow.reservation_id ) }}"><i class="fas fa-ban"> Cancel reservation</i></a>
                                         <a class="navbar-btn btn btn-outline-info my-reservation-button" href="{{ url_for('extend', reservation_id=bungalow.reservation_id, direction_forward=True ) }}"><i class="fas fa-plus"> Extend 1 week forwards</i></a>
                                         <a class="navbar-btn btn btn-outline-info my-reservation-button" href="{{ url_for('extend', reservation_id=bungalow.reservation_id, direction_forward=False ) }}"><i class="fas fa-minus"> Extend 1 week backwards</i></a>
-                                        <a class="navbar-btn btn btn-outline-info my-reservation-button" href="{{ url_for('cancel', reservation_id=bungalow.reservation_id ) }}"><i class="fas fa-undo"> Change type</i></a>
+                                        <a class="navbar-btn btn btn-outline-info my-reservation-button" href="{{ url_for('change_type', reservation_id=bungalow.reservation_id ) }}"><i class="fas fa-undo"> Change type</i></a>
                                     </div>
                             </div>
                         </div>  

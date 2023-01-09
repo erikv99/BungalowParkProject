@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+
+{% if model.message_content != "" and model.message_type.value != "" %}
+<div class="alert {{model.message_type.value}}">
+    <p>{{model.message_content}}</p>
+</div>
+{% endif %}
+
+    <h3 class="title">Change bungalow type for reservation</h3>
+    <h4 class="alt-title">Selected</h4>
+    <div class="col-sm">
+        <div class="thumbnail reserve-thumbnail">
+            
+            <img class="img-thumbnail reserve-img-thumbnail" src="{{ url_for('static', filename='img/' + model.bungalow.img_file_name) }}" />
+            <div class="caption reserve-caption">
+                    <p class="">{{model.bungalow.unique_name}}</p>
+
+                    {% if model.bungalow.type != None %}
+                        <p class="reserve-text">
+                            Suitable for up to {{model.bungalow.type.size}} people
+                            Weekprice: {{model.bungalow.type.week_price}}
+                        </p>
+                    {% endif %}
+                    
+            </div>
+        </div>
+    </div>  
+
+    <h4 class="alt-title">Available</h4>
+
+    {% for bungalow in available_bungalows %}
+        <div class="col-sm">
+            <div class="thumbnail reserve-thumbnail">
+                <img class="img-thumbnail reserve-img-thumbnail" src="{{ url_for('static', filename='img/' + model.bungalow.img_file_name) }}" />
+                <div class="caption reserve-caption">
+                        <p class="">{{model.bungalow.unique_name}}</p>
+
+                        {% if model.bungalow.type != None %}
+                            <p class="reserve-text">
+                                Suitable for up to {{model.bungalow.type.size}} people
+                                Weekprice: {{model.bungalow.type.week_price}}
+                            </p>
+                        {% endif %}
+                        
+                        
+        
+                </div>
+            </div>
+        </div>  
+    {% endfor %}
+{% endblock %}

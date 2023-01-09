@@ -1,7 +1,10 @@
 from flask import render_template, session
 from sqlalchemy import func
 from __main__ import app, db
+
+# Enum imports
 from enums.messageType import MessageType
+from enums.PermissionUser import PermissionUser as PU
 
 # View model imports.
 from models.viewModels.indexVM import IndexVM
@@ -11,6 +14,7 @@ from models.viewModels.reserveVM import ReserveVM
 from models.viewModels.adminVM import AdminVM
 from models.viewModels.bungalowsVM import BungalowsVM
 from models.viewModels.myReservationsVM import MyReservationVM
+from models.viewModels.changeTypeVM import ChangeTypeVM
 from models.viewModels.viewModelBase import ViewModelBase
 
 # Database model imports.
@@ -30,6 +34,43 @@ from models.databaseModels.user import User
 from helpers.authHelper import AuthHelper
 from helpers.reservationHelper import ReservationHelper
 
+# View names with their required level of permissions in order to view it
+view_permissions = {
+    "admin.html": PU.ADMIN,
+    "bungalows.html": PU.EVERYONE,
+    "changeType.html": PU.AUTHORIZED_USER,
+    "error.html": PU.EVERYONE,
+    "index.html": PU.EVERYONE,
+    "layout.html": PU.EVERYONE,
+    "login.html": PU.EVERYONE,
+    "myReservations.html": PU.AUTHORIZED_USER,
+    "noPermission.html": PU.EVERYONE,
+    "register.html": PU.EVERYONE,
+    "reserve.html": PU.AUTHORIZED_USER,
+}
+
+def _has_permission(model, template_name): 
+
+    # Checking if the needed permission for the view (template) exists
+    needed_permission = view_permissions.get(template_name, None)
+
+    # If needed_permission not found for current template we assume its a new template and we didn't update the view_permissions list so we deny access.
+    if needed_permission == None:
+        return False
+
+    # If permission applies to auth user or admin 
+    if needed_permission == PU.AUTHORIZED_USER or needed_permission == PU.ADMIN:
+        
+        # If user is not logged in 
+        if not model.is_logged_in:
+            return False
+        
+        # If neede perm is admin and user is not admin
+        if needed_permission == PU.ADMIN:
+            if not model.is_admin:
+                return False
+
+    return True
 
 def _render_template(template_name, model = None, form = None):
     """
@@ -45,6 +86,11 @@ def _render_template(template_name, model = None, form = None):
     model.is_logged_in = session.get("is_logged_in")
     model.is_admin = session.get("is_admin")
     model.user_id = session.get("user_id")
+
+    # If user has no permission for the view we 'redirect' to the no perm page
+    # This should make sure that typing a route in the taskbar wont bring you to this actual page if you don't have permission
+    if not _has_permission(model, template_name):
+        return render_template("noPermission.html", model=model)
 
     if form is not None:
         return render_template(template_name, model=model, form=form)
@@ -248,38 +294,32 @@ def reserve_submit():
     form.bungalow_id.data = bungalow_id
     return _render_template('reserve.html', model=model, form=form)
 
-def _get_reservations():
-    """
-        Returns a list containing all reservations for the current logged in user.
-    """
 
-    return Reservation.query.filter(Reservation.user_id == session["user_id"]).all()
+@app.route("/my_reservations", methods=["POST", "GET"])
+def my_reservations():
 
-def _get_grouped_bungalows(reservations):
-    """
-        Returns the grouped (by 3) list of bungalowDto's
-        Used to build the view for the myReservations.html view
-    """
-    bungalowDtos = []
+    # Loading all reservations for the logged in user from the database.
+    reservations = Reservation.query.filter(Reservation.user_id == session["user_id"]).all()
+    model = MyReservationVM()
 
-    # Each bungalow here is a data transfer object which has a slight modification on the the original bungalow database model,
-    # Reason for this is we need the reservation id for each displayed bungalow so we can use cancel functionalitity
-    for reservation in reservations:
+    # If the user has no reservation we send a message informing them
+    if len(reservations) == 0:
 
-        reservation_bungalow_dto = ReservationBungalowDto()
-        reservation_bungalow_dto.id = reservation.bungalow.id
-        reservation_bungalow_dto.img_file_name = reservation.bungalow.img_file_name
-        reservation_bungalow_dto.type = reservation.bungalow.type
-        reservation_bungalow_dto.type_id = reservation.bungalow.type_id
-        reservation_bungalow_dto.unique_name = reservation.bungalow.unique_name
-        reservation_bungalow_dto.reservation_id = reservation.id
-        reservation_bungalow_dto.week_number = reservation.reserveration_week_number
-        bungalowDtos.append(reservation_bungalow_dto)
+        model = _add_message(model, MessageType.INFO, "You have no reservations")
+        return _render_template('myReservations.html', model=model)
 
-    # Making sure the bungalow dto's are grouped by groups of 3 for displaying purposes.
-    return ReservationHelper().GetGroupedBungalows(bungalowDtos)
+    model.grouped_bungalows = ReservationHelper().GetGroupedReservations()
+    return _render_template('myReservations.html', model=model)
 
-@app.route("/extend/<reservation_id>/<direction_forward>", )
+@app.route("/my_reservations/cancel/<reservation_id>")
+def cancel(reservation_id):
+
+    # all we have to do is delete te reservation and return the my_reservation view basically.
+    Reservation.query.filter(Reservation.id == reservation_id).delete()
+    db.session.commit()
+    return my_reservations()
+
+@app.route("/my_reservations/extend/<reservation_id>/<direction_forward>", )
 def extend(reservation_id, direction_forward):
 
     model = MyReservationVM()
@@ -287,7 +327,7 @@ def extend(reservation_id, direction_forward):
 
     # Getting the default grouped bungelows, this means that the 'extended' reservation is not present yet.
     # Reason we get this now is that we can just return the view with the error message when required.
-    model.grouped_bungalows = _get_grouped_bungalows(_get_reservations())
+    model.grouped_bungalows = ReservationHelper().GetGroupedReservations()
 
     if reservation == None:
 
@@ -333,33 +373,45 @@ def extend(reservation_id, direction_forward):
 
     # Since we were succesfull in extending the reservation we have to reload all this in order to 
     # get accurate results (remember we just added a new entry in the db)       
-    model.grouped_bungalows = _get_grouped_bungalows(_get_reservations())
+    model.grouped_bungalows = ReservationHelper().GetGroupedReservations()
 
     return _render_template('myReservations.html', model=model)
 
-@app.route("/my_reservations", methods=["POST", "GET"])
-def my_reservations():
+@app.route("/my_reservations/change_type/<reservation_id>")
+def change_type(reservation_id):
 
-    # Loading all reservations for the logged in user from the database.
-    reservations = Reservation.query.filter(Reservation.user_id == session["user_id"]).all()
-    model = MyReservationVM()
+    model = ChangeTypeVM()
+    reservation = Reservation.query.where(Reservation.id == reservation_id).first()
+    
+    # If we cant find a reservation with that id we just go back to the my reservation page with a fitting error message
+    if reservation == None:
 
-    # If the user has no reservation we send a message informing them
-    if len(reservations) == 0:
-
-        model = _add_message(model, MessageType.INFO, "You have no reservations")
+        model.grouped_bungalows = ReservationHelper().GetGroupedReservations()
+        model = _add_message(model, MessageType.ERROR, "Failed loading template, reservation not found for id " + str(reservation_id))
         return _render_template('myReservations.html', model=model)
 
-    model.grouped_bungalows = _get_grouped_bungalows(reservations)
+    model.bungalow = reservation.bungalow
+    model.reservation = reservation
+
+    # Getting all bungalows already reserved for the week in question
+    reserved_bungalow_ids = [ entry[0] for entry in db.session.query(Reservation.bungalow_id).where(Reservation.reserveration_week_number == reservation.reserveration_week_number).all()]
+
+    # Getting all bungalows not already reserved for the given week
+    available_bungalows = Bungalow.query.where(Bungalow.id not in reserved_bungalow_ids)
+
+    model.available_bungalows = available_bungalows
+    return _render_template("changeType.html", model)
+
+@app.route("/my_reservations/change_type/confirm/<reservation_id>/<type_id>")
+def change_type_confirm(reservation_id, type_id):
+
+    model = ChangeTypeVM()
+
+    # Rendering the my reservations view with a message saying the reservation type changed
+    model.grouped_bungalows = ReservationHelper().GetGroupedReservations()
+    model = _add_message(model, MessageType.SUCCESS, "Reservation type changed")
     return _render_template('myReservations.html', model=model)
 
-@app.route("/cancel/<reservation_id>")
-def cancel(reservation_id):
-
-    # all we have to do is delete te reservation and return the my_reservation view basically.
-    Reservation.query.filter(Reservation.id == reservation_id).delete()
-    db.session.commit()
-    return my_reservations()
 
 @app.route("/admin", methods=["POST", "GET"])
 def admin():
@@ -368,6 +420,11 @@ def admin():
     return _render_template('admin.html', model=model)
 
 # Error routes
+
+@app.route("/no_permission") 
+def no_permission():
+    return _render_template("noPermission.html")
+
 
 @app.errorhandler(404)
 def page_not_found(e):

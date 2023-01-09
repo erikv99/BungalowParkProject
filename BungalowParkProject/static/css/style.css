@@ -142,6 +142,13 @@
     font-weight: 560;
 }
 
+.alt-title {
+    color: orange;
+    margin-left: 0.5em;
+    margin-bottom: 2em;
+    font-weight: 560;
+}
+
 .reserve-thumbnail {
     padding-top: 1em;
     padding-left: 1em;

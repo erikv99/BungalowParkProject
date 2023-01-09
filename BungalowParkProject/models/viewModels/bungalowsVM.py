@@ -1,3 +1,4 @@
+from enums.messageType import MessageType
 from .viewModelBase import ViewModelBase
 
 class BungalowsVM(ViewModelBase):
@@ -8,3 +9,6 @@ class BungalowsVM(ViewModelBase):
 
     # Bungalows are grouped by 3 for ease of displaying.
     grouped_bungalows = []
+
+    message_type = MessageType.NONE
+    message_content = ""
