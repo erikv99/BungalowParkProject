@@ -149,12 +149,8 @@ def register_submit():
 def bungalows():
     model = BungalowsVM()
 
-    # Getting all id's of reserved bungalows using list extension on the result tuple to create a flat list
-    reserved_bungalows_ids = [tuple_entry[0] for tuple_entry in Reservation.query.with_entities(Reservation.bungalow_id).all()]
-    
-    # Getting all bungalows which are not reserved
-    bungalows = Bungalow.query.filter(Bungalow.id.not_in(reserved_bungalows_ids)).all()
-
+    # Getting all bungalows 
+    bungalows = Bungalow.query.all()
     model.grouped_bungalows = ReservationHelper().GetGroupedBungalows(bungalows)
     return _render_template('bungalows.html', model=model)
 
@@ -165,6 +161,7 @@ def reserve(bungalow_id):
     model = ReserveVM()
     form = ReservationForm()
 
+    # If we didnt find the bungalow returning a message
     if bungalow == None:
 
         model = _add_message(model, MessageType.ERROR, "Error retrieving bungalow from the database with id: " + bungalow_id)
@@ -172,6 +169,7 @@ def reserve(bungalow_id):
     
     bungalow_type = BungalowType.query.filter(BungalowType.id == bungalow.type_id).first()
 
+    # If we didnt find the bungalow type returning a message
     if bungalow_type == None: 
 
         model = _add_message(model, MessageType.ERROR, "Error retrieving bungalow_type from the database for bungalow with id: " + bungalow_id)
@@ -215,7 +213,8 @@ def reserve_submit():
 
     # Checking if bungalow is not already reserved
     alreadyReserved = db.session.query(func.count(Reservation.id)) \
-        .where(Reservation.bungalow_id == bungalow_id and Reservation.reserveration_week_number == week_number) \
+        .where(Reservation.bungalow_id == bungalow_id) \
+        .where(Reservation.reserveration_week_number == week_number) \
         .first()[0] > 0
 
     # If already reserved rendering the view with a error message.
@@ -275,6 +274,7 @@ def my_reservations():
         reservation_bungalow_dto.type_id = reservation.bungalow.type_id
         reservation_bungalow_dto.unique_name = reservation.bungalow.unique_name
         reservation_bungalow_dto.reservation_id = reservation.id
+        reservation_bungalow_dto.week_number = reservation.reserveration_week_number
         bungalowDtos.append(reservation_bungalow_dto)
 
     # Making sure the bungalow dto's are grouped by groups of 3 for displaying purposes.

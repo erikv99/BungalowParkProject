@@ -16,8 +16,6 @@ import routes
 
 def main():
 
-    print("Main executed...")
-
     # Setting the secret key
     app.config["SECRET_KEY"] = "SECRETKEY"
     app.config["SESSION_COOKIE_SECURE"] = False
@@ -39,7 +37,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-else:
-    print("App was unable to launch since __name__ != __main__")
 
     

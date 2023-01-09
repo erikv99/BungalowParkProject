@@ -28,6 +28,7 @@
                                 <img class="img-thumbnail" src="{{ url_for('static', filename='img/' + bungalow.img_file_name) }}" />
                                 <div class="caption">
                                         <p class="caption-text">{{bungalow.unique_name}}</p>
+                                        <p class="caption-text">Reservation for week {{bungalow.week_number}}</p>
                                         <a class="navbar-btn btn btn-outline-info" href="{{ url_for('cancel', reservation_id=bungalow.reservation_id ) }}"><i class="fas fa-ban"> Cancel reservation</i></a>
                                 </div>
                             </div>

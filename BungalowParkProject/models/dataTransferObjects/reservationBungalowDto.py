@@ -6,6 +6,7 @@ class ReservationBungalowDto():
     img_file_name = None
     type = None
     reservation_id = None
+    week_number = None
 
     def __repr__(self):
         return "Bungalow\nid: {}\ntype_id: {}\nunique_name: {}\nimg_file_name: {}" \

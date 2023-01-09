@@ -18,12 +18,6 @@
 
 <h3>Make reservation</h3>
 
-{% if model.message_content != "" and model.message_type.value != "" %}
-<div class="alert {{model.message_type.value}}">
-    <p>{{model.message_content}}</p>
-</div>
-{% endif %}
-
 {% if not model.is_logged_in %}
     <p>
         In order to make a reservation you must <a href="{{ url_for('login') }}">login</a>
