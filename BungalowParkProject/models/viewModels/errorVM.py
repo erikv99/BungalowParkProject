@@ -1,7 +1,6 @@
-from viewModelBase import ViewModelBase
-from ...enums.messageType import MessageType
+from .viewModelBase import ViewModelBase
 
-class ReserveVM(ViewModelBase):
+class ErrorVM(ViewModelBase):
     """
         View model for the error.html view, 
         contains all possible data which can be used to construct the view.

@@ -28,22 +28,21 @@
             <div class="thumbnail reserve-thumbnail">
                 <img class="img-thumbnail reserve-img-thumbnail" src="{{ url_for('static', filename='img/' + model.bungalow.img_file_name) }}" />
                 <div class="caption reserve-caption">
-                        <p class="">{{model.bungalow.unique_name}}</p>
-                        {% if model.bungalow_type != None %}
-                            <p class="reserve-text">
-                                Suitable for up to {{model.bungalow_type.size}} people
-                                Weekprice: {{model.bungalow_type.week_price}}
-                            </p>
-                        {% endif %}
-                        <form method="POST" action="{{ url_for('reserve_submit') }}">
-                            {{ form.hidden_tag() }}
-                            {{ form.date.label}}
-                            <br/>
-                            {{ form.date() }} 
-                            <br />
-                            {{ form.submit(class_="btn btn-lg btn-outline-info btn-block auth-submit") }}
-                        </form>
-                        
+                    <p class="">{{model.bungalow.unique_name}}</p>
+                    {% if model.bungalow_type != None %}
+                        <p class="reserve-text">
+                            Suitable for up to {{model.bungalow_type.size}} people
+                            Weekprice: {{model.bungalow_type.week_price}}
+                        </p>
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('reserve_submit') }}">
+                        {{ form.hidden_tag() }}
+                        {{ form.date.label}}
+                        <br/>
+                        {{ form.date() }} 
+                        <br />
+                        {{ form.submit(class_="btn btn-lg btn-outline-info btn-block auth-submit") }}
+                    </form>
                 </div>
             </div>
         </div>  

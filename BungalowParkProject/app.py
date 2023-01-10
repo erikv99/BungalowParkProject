@@ -37,13 +37,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-"""
-    TODO
-
-    Make redirects for unauthorized access to endpoints, for example manually typing /admin should redirect to a no access page i guess
-"""
-
-    

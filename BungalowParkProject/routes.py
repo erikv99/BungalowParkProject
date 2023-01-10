@@ -1,5 +1,5 @@
 from flask import render_template, session
-from sqlalchemy import func, update
+from sqlalchemy import func
 from __main__ import app, db
 
 # Enum imports
@@ -7,7 +7,6 @@ from enums.messageType import MessageType
 from enums.PermissionUser import PermissionUser as PU
 
 # View model imports.
-from models.viewModels.indexVM import IndexVM
 from models.viewModels.loginVM import LoginVM
 from models.viewModels.registerVM import RegisterVM
 from models.viewModels.reserveVM import ReserveVM
@@ -15,15 +14,13 @@ from models.viewModels.adminVM import AdminVM
 from models.viewModels.bungalowsVM import BungalowsVM
 from models.viewModels.myReservationsVM import MyReservationVM
 from models.viewModels.changeTypeVM import ChangeTypeVM
+from models.viewModels.errorVM import ErrorVM
 from models.viewModels.viewModelBase import ViewModelBase
 
 # Database model imports.
 from models.databaseModels.bungalow import Bungalow
 from models.databaseModels.bungalowType import BungalowType
 from models.databaseModels.reservation import Reservation
-
-
-from models.dataTransferObjects.reservationBungalowDto import ReservationBungalowDto
 
 # Form imports
 from forms.reservationForm import ReservationForm
@@ -50,6 +47,10 @@ view_permissions = {
 }
 
 def _has_permission(model, template_name): 
+    """
+        Checks if the current user has permission to view the template.
+        Returns a bool
+    """
 
     # Checking if the needed permission for the view (template) exists
     needed_permission = view_permissions.get(template_name, None)
@@ -78,11 +79,11 @@ def _render_template(template_name, model = None, form = None):
         contains logic to add the data which every model needs
     """
 
-    # If no model is given we still need to give at least the base so the header knows if user is logged in or not.
+    # If no model is given we still need to give at least the base (ViewModelBase) so the template knows if user is logged in or not.
     if model is None:
         model = ViewModelBase()
 
-    # Checking if user is logged in and if user is an admin
+    # Getting data for currently logged in (or not) user
     model.is_logged_in = session.get("is_logged_in")
     model.is_admin = session.get("is_admin")
     model.user_id = session.get("user_id")
@@ -92,8 +93,10 @@ def _render_template(template_name, model = None, form = None):
     if not _has_permission(model, template_name):
         return render_template("noPermission.html", model=model)
 
+    # Rendering template 
     if form is not None:
         return render_template(template_name, model=model, form=form)
+
     else:
         return render_template(template_name, model=model)
 
@@ -110,9 +113,7 @@ def _add_message(model, message_type, error_message):
 @app.route("/home")
 @app.route("/")
 def index():
-
-    model = IndexVM()
-    return _render_template('index.html', model=model)
+    return _render_template('index.html')
 
 @app.route("/logout", methods=["POST", "GET"])
 def logout():
@@ -126,7 +127,6 @@ def logout():
         model = _add_message(model, MessageType.SUCCESS, "You are now logged out")
 
     except:
-
         model = _add_message(model, MessageType.ERROR, "Error while trying to log out")
 
     return _render_template('login.html', model=model, form=form)
@@ -152,7 +152,6 @@ def login_submit():
         model = AuthHelper().Login(username, password)
 
     else:
-
         model = _add_message(model, MessageType.ERROR, "Error submitting form")
 
     return _render_template('login.html', model=model, form=form)
@@ -170,6 +169,7 @@ def register_submit():
     form = RegisterForm()
     model = RegisterVM()
 
+    # If the form is valid we get the given data and attempt to register the user.
     if form.validate_on_submit():
 
         username = form.data.get("user_name")
@@ -182,11 +182,9 @@ def register_submit():
             model = _add_message(model, MessageType.SUCCESS, "Registration completed")
         
         else:
-
              model = _add_message(model, MessageType.ERROR, "Passwords do not match")
     
     else:
-        
         model = _add_message(model, MessageType.ERROR, "Error registering user")
 
     return _render_template('register.html', model=model, form=form)
@@ -200,7 +198,7 @@ def bungalows():
     model.grouped_bungalows = ReservationHelper().GetGroupedBungalows(bungalows)
     return _render_template('bungalows.html', model=model)
 
-@app.route("/reserve/<bungalow_id>", methods=["POST", "GET"])
+@app.route("/reserve/<bungalow_id>")
 def reserve(bungalow_id):
 
     bungalow = Bungalow.query.filter(Bungalow.id == bungalow_id).first()
@@ -265,7 +263,7 @@ def reserve_submit():
 
     # If already reserved rendering the view with a error message.
     if alreadyReserved:
-        
+
         model.bungalow = Bungalow.query.where(Bungalow.id == bungalow_id).first()
         model = _add_message(model, MessageType.ERROR, "Bungalow is already reserved")
         return _render_template('reserve.html', model=model, form=form)
@@ -274,6 +272,7 @@ def reserve_submit():
     bungalow = Bungalow.query.filter(Bungalow.id == bungalow_id).first()
 
     if bungalow == None:
+
         model = _add_message(model, MessageType.ERROR, "Error retrieving bungalow from the database with id: " + bungalow_id + "\nReservation failed.")
         return _render_template('reserve.html', model=model, form=form)
     
@@ -281,6 +280,7 @@ def reserve_submit():
     bungalow_type = BungalowType.query.filter(BungalowType.id == bungalow.type_id).first()
 
     if bungalow_type == None: 
+
         model = _add_message(model, MessageType.ERROR, "Error retrieving bungalow_type from the database for bungalow with id: " + bungalow_id + "\nReservation failed")
         return _render_template('reserve.html', model=model, form=form)
 
@@ -295,7 +295,6 @@ def reserve_submit():
     form.date.data = date
     form.bungalow_id.data = bungalow_id
     return _render_template('reserve.html', model=model, form=form)
-
 
 @app.route("/my_reservations")
 def my_reservations():
@@ -321,8 +320,17 @@ def cancel(reservation_id):
     db.session.commit()
     return my_reservations()
 
-@app.route("/my_reservations/extend/<reservation_id>/<direction_forward>", )
+@app.route("/my_reservations/extend/<reservation_id>/<direction_forward>")
 def extend(reservation_id, direction_forward):
+    """
+        Extend a reservation
+        arg reservation_id: reservation id of reservation to extend
+        arg direction_forward: boolean which determines wheter or not it should be extended forward (next week)
+            or backwards (week before)
+
+        Reason this route is commented and others are not is since I realize direction_forward is a sloppy and unclean way
+        to do this.
+    """
 
     model = MyReservationVM()
     reservation = Reservation.query.where(Reservation.id == reservation_id).first()
@@ -428,7 +436,6 @@ def admin():
     return _render_template('admin.html', model=model)
 
 # Error routes
-
 @app.route("/no_permission") 
 def no_permission():
     return _render_template("noPermission.html")
@@ -437,5 +444,8 @@ def no_permission():
 @app.errorhandler(404)
 def page_not_found(e):
     
+    model = ErrorVM()
+    model.message = "Page could not be found"
+    model.error_code = 404
     # note that we set the 404 status explicitly
-    return _render_template('error.html')
+    return _render_template('error.html', model=model)

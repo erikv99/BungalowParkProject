@@ -9,6 +9,15 @@
 {% endblock %}
 
 {% block content %}
-<h3>Error</h3>
-<p>Everything is totally fucked</p>
+    <h3 class="title">Error</h3>
+
+    {% if model.error_code != None %}
+        <p>Status code: {{model.error_code}}</p>
+    {% endif %}
+
+    {% if model.message != None %}
+        <p>{{model.message}}</p>
+    {% else %}
+        <p>We're sorry, an error occurred and we currently can't help you</p>
+    {% endif %}
 {% endblock %}
