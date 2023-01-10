@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Login
+    Bungalows
 {% endblock %}
 
 {% block head %}
@@ -30,7 +30,9 @@
                             <img class="img-thumbnail" src="{{ url_for('static', filename='img/' + bungalow.img_file_name) }}" />
                             <div class="caption">
                                     <p class="caption-text">{{bungalow.unique_name}}</p>
-                                    <a class="navbar-btn btn btn-outline-info" href="{{ url_for('reserve', bungalow_id=bungalow.id) }}"><i class="fas fa-plane"> See more</i></a>
+                                    {% if model.is_logged_in %}
+                                        <a class="navbar-btn btn btn-outline-info" href="{{ url_for('reserve', bungalow_id=bungalow.id) }}"><i class="fas fa-plane"> See more</i></a>
+                                    {% endif %}
                             </div>
                         </div>
                     </div>  

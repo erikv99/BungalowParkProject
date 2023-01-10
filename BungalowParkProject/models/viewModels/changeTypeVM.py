@@ -11,4 +11,4 @@ class ChangeTypeVM(ViewModelBase):
     message_content = ""
     bungalow = None
     reservation = None
-    available_bungalows = None
+    grouped_available_bungalows = None

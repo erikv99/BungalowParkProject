@@ -1,5 +1,5 @@
 from flask import render_template, session
-from sqlalchemy import func
+from sqlalchemy import func, update
 from __main__ import app, db
 
 # Enum imports
@@ -265,6 +265,8 @@ def reserve_submit():
 
     # If already reserved rendering the view with a error message.
     if alreadyReserved:
+        
+        model.bungalow = Bungalow.query.where(Bungalow.id == bungalow_id).first()
         model = _add_message(model, MessageType.ERROR, "Bungalow is already reserved")
         return _render_template('reserve.html', model=model, form=form)
 
@@ -295,7 +297,7 @@ def reserve_submit():
     return _render_template('reserve.html', model=model, form=form)
 
 
-@app.route("/my_reservations", methods=["POST", "GET"])
+@app.route("/my_reservations")
 def my_reservations():
 
     # Loading all reservations for the logged in user from the database.
@@ -396,22 +398,28 @@ def change_type(reservation_id):
     # Getting all bungalows already reserved for the week in question
     reserved_bungalow_ids = [ entry[0] for entry in db.session.query(Reservation.bungalow_id).where(Reservation.reserveration_week_number == reservation.reserveration_week_number).all()]
 
-    # Getting all bungalows not already reserved for the given week
-    available_bungalows = Bungalow.query.where(Bungalow.id not in reserved_bungalow_ids)
+    # Getting all available bungalows for the given week which are not reserved
+    available_bungalows = Bungalow.query.where(Bungalow.id.not_in(reserved_bungalow_ids)).all()
+    
+    # Grouping the available bungalows in groups of 3 and ofc adding them to the model
+    model.grouped_available_bungalows =  ReservationHelper().GetGroupedBungalows(available_bungalows)
 
-    model.available_bungalows = available_bungalows
     return _render_template("changeType.html", model)
 
-@app.route("/my_reservations/change_type/confirm/<reservation_id>/<type_id>")
-def change_type_confirm(reservation_id, type_id):
+@app.route("/my_reservations/change_type/confirm/<reservation_id>/<bungalow_id>")
+def change_type_confirm(reservation_id, bungalow_id):
 
-    model = ChangeTypeVM()
+    # Updating the reservation and changing its bungalow id (bungalow type) which is attached to the reservation
+    reservation = Reservation.query.where(Reservation.id == reservation_id).first()
+    reservation.bungalow_id = bungalow_id
+    db.session.commit()
+
+    model = MyReservationVM()
 
     # Rendering the my reservations view with a message saying the reservation type changed
     model.grouped_bungalows = ReservationHelper().GetGroupedReservations()
     model = _add_message(model, MessageType.SUCCESS, "Reservation type changed")
     return _render_template('myReservations.html', model=model)
-
 
 @app.route("/admin", methods=["POST", "GET"])
 def admin():

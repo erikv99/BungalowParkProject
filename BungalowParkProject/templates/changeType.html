@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Login
+    Change type
 {% endblock %}
 
 {% block head %}
@@ -36,26 +36,37 @@
         </div>
     </div>  
 
-    <h4 class="alt-title">Available</h4>
+    <h4 class="alt-title">Available bungalows</h4>
+    <p class="sub-title">Press switch to switch reservation to the selected bungalow</p>
 
-    {% for bungalow in available_bungalows %}
-        <div class="col-sm">
-            <div class="thumbnail reserve-thumbnail">
-                <img class="img-thumbnail reserve-img-thumbnail" src="{{ url_for('static', filename='img/' + model.bungalow.img_file_name) }}" />
-                <div class="caption reserve-caption">
-                        <p class="">{{model.bungalow.unique_name}}</p>
+    <div class="container bungalow-container">
+        <table>
+            {% for group in model.grouped_available_bungalows %}
+                <tr>
+                    {% for bungalow in group %}
+                        <td>
+                            <div class="col-sm">
+                                <div class="thumbnail reserve-thumbnail">
+                                    <img class="img-thumbnail reserve-img-thumbnail" src="{{ url_for('static', filename='img/' + bungalow.img_file_name) }}" />
+                                    <div class="caption reserve-caption">
+                                            <p class="">{{bungalow.unique_name}}</p>
+                
+                                            {% if bungalow.type != None %}
+                                                <p class="reserve-text">
+                                                    Suitable for up to {{bungalow.type.size}} people
+                                                    Weekprice: {{bungalow.type.week_price}}
+                                                </p>
+                                            {% endif %}
 
-                        {% if model.bungalow.type != None %}
-                            <p class="reserve-text">
-                                Suitable for up to {{model.bungalow.type.size}} people
-                                Weekprice: {{model.bungalow.type.week_price}}
-                            </p>
-                        {% endif %}
-                        
-                        
-        
-                </div>
-            </div>
-        </div>  
-    {% endfor %}
+                                            <a class="navbar-btn btn btn-outline-info" href="{{ url_for('change_type_confirm', reservation_id=model.reservation.id, bungalow_id=bungalow.id) }}"><i class="fas fa-exchange-alt"> Switch</i></a>
+                                    </div>
+                                </div>
+                            </div>  
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
 {% endblock %}

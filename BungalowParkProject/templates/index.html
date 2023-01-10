@@ -9,6 +9,14 @@
 {% endblock %}
 
 {% block content %}
-<h3>Home</h3>
-<p>Home page</p>
+<div class="col-md">
+    <h4 class="alt-title">Home</h4>
+    <p class="sub-title">Welcome to <b>Zee en Duin</p>
+</div>
+
+<div class="col-md">
+    <img class="home-img" src="{{ url_for('static', filename='img/home.jpg') }}"/>
+</div>
+
+
 {% endblock %}

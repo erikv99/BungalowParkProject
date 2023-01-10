@@ -145,8 +145,13 @@
 .alt-title {
     color: orange;
     margin-left: 0.5em;
-    margin-bottom: 2em;
     font-weight: 560;
+}
+
+.sub-title {
+    margin-left: 0.8em;
+    font-weight: lighter;
+    margin-top: -0.4em;
 }
 
 .reserve-thumbnail {
@@ -175,4 +180,13 @@
 
     width: 80%;
     text-align: left;
+}
+
+.home-img {
+    display: block;
+    margin: 0px auto;
+    margin-top: 0px;
+    margin-top: 4em;
+    border: 4px groove gray;
+    max-height: 500px;
 }
