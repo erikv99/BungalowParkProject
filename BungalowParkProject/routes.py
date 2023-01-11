@@ -513,5 +513,4 @@ def page_not_found(e):
     model = ErrorVM()
     model.message = "Page could not be found"
     model.error_code = 404
-    # note that we set the 404 status explicitly
     return _render_template('error.html', model=model)
