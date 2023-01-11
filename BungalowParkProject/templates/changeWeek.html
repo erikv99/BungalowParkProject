@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Change type
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+
+    {% if model.message_content != "" and model.message_type.value != "" %}
+        <div class="alert {{model.message_type.value}}">
+            <p>{{model.message_content}}</p>
+        </div>
+    {% endif %}
+
+    <h3 class="title">Change week for reservation</h3>
+    <div class="col-sm">
+        <div class="thumbnail reserve-thumbnail">
+            
+            <img class="img-thumbnail reserve-img-thumbnail" src="{{ url_for('static', filename='img/' + model.reservation.bungalow.img_file_name) }}" />
+            <div class="caption reserve-caption">
+                    <p class="">{{model.reservation.bungalow.unique_name}}</p>
+
+                    {% if model.reservation.bungalow.type != None %}
+                        <p class="reserve-text">
+                            Suitable for up to {{model.reservation.bungalow.type.size}} people
+                            Weekprice: {{model.reservation.bungalow.type.week_price}}
+                        </p>
+                    {% endif %}
+
+                    <h3>Change week</h3>
+
+                    <form method="POST" action="{{ url_for('change_week_submit') }}">
+                        {{ form.hidden_tag() }}
+                        {{ form.date.label}}
+                        <br/>
+                        {{ form.date() }} 
+                        <br />
+                        {{ form.submit(class_="btn btn-lg btn-outline-info btn-block auth-submit") }}
+                    </form>
+            </div>
+        </div>
+    </div>  
+    
+{% endblock %}

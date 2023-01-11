@@ -25,14 +25,12 @@
                 {% for bungalow in bungalow_group %}
                 <td>
                     <div class="col-sm">
-                        <div class="thumbnail">
+                        <div class="thumbnail bungalow-thumbnail">
                             <img class="img-thumbnail" src="{{ url_for('static', filename='img/' + bungalow.img_file_name) }}" />
-                            <div class="caption">
-                                    <p class="caption-text">{{bungalow.unique_name}}</p>
-                                    {% if model.is_logged_in %}
-                                        <a class="navbar-btn btn btn-outline-info" href="{{ url_for('reserve', bungalow_id=bungalow.id) }}"><i class="fas fa-plane"> See more</i></a>
-                                    {% endif %}
-                            </div>
+                            <p class="caption-text">{{bungalow.unique_name}}</p>
+                            {% if model.is_logged_in %}
+                                <a class="navbar-btn btn btn-outline-info bungalow-btn" href="{{ url_for('reserve', bungalow_id=bungalow.id) }}"><i class="fas fa-plane"> See more</i></a>
+                            {% endif %}
                         </div>
                     </div>  
                 </td>

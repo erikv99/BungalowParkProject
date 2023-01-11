@@ -31,8 +31,6 @@ class PopulateHelper():
     def _populate_bungalows(self):
         """
             Makes sure that on first creation of the db the available bungalow types are populated.
-
-            Note: maybe at one point the creation of new available bungalows will become responsibility of admins.
         """
 
         from models.databaseModels.bungalow import Bungalow

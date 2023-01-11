@@ -1,7 +1,7 @@
 from enums.messageType import MessageType
-from .viewModelBase import ViewModelBase
+from .baseVM import BaseVM
 
-class BungalowsVM(ViewModelBase):
+class BungalowsVM(BaseVM):
     """
         View model for the bungalows.html view, 
         contains all possible data which can be used to construct the view.
@@ -9,6 +9,3 @@ class BungalowsVM(ViewModelBase):
 
     # Bungalows are grouped by 3 for ease of displaying.
     grouped_bungalows = []
-
-    message_type = MessageType.NONE
-    message_content = ""

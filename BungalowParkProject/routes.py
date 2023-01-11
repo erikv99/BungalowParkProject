@@ -7,15 +7,13 @@ from enums.messageType import MessageType
 from enums.PermissionUser import PermissionUser as PU
 
 # View model imports.
-from models.viewModels.loginVM import LoginVM
-from models.viewModels.registerVM import RegisterVM
 from models.viewModels.reserveVM import ReserveVM
-from models.viewModels.adminVM import AdminVM
 from models.viewModels.bungalowsVM import BungalowsVM
 from models.viewModels.myReservationsVM import MyReservationVM
 from models.viewModels.changeTypeVM import ChangeTypeVM
 from models.viewModels.errorVM import ErrorVM
-from models.viewModels.viewModelBase import ViewModelBase
+from models.viewModels.changeWeekVM import ChangeWeekVM
+from models.viewModels.baseVM import BaseVM
 
 # Database model imports.
 from models.databaseModels.bungalow import Bungalow
@@ -26,6 +24,7 @@ from models.databaseModels.reservation import Reservation
 from forms.reservationForm import ReservationForm
 from forms.loginForm import LoginForm
 from forms.registerForm import RegisterForm
+from forms.changeWeekForm import ChangeWeekForm
 
 from models.databaseModels.user import User
 from helpers.authHelper import AuthHelper
@@ -33,7 +32,6 @@ from helpers.reservationHelper import ReservationHelper
 
 # View names with their required level of permissions in order to view it
 view_permissions = {
-    "admin.html": PU.ADMIN,
     "bungalows.html": PU.EVERYONE,
     "changeType.html": PU.AUTHORIZED_USER,
     "error.html": PU.EVERYONE,
@@ -44,6 +42,7 @@ view_permissions = {
     "noPermission.html": PU.EVERYONE,
     "register.html": PU.EVERYONE,
     "reserve.html": PU.AUTHORIZED_USER,
+    "changeWeek.html": PU.AUTHORIZED_USER
 }
 
 def _has_permission(model, template_name): 
@@ -59,17 +58,12 @@ def _has_permission(model, template_name):
     if needed_permission == None:
         return False
 
-    # If permission applies to auth user or admin 
-    if needed_permission == PU.AUTHORIZED_USER or needed_permission == PU.ADMIN:
+    # If permission applies to auth user 
+    if needed_permission == PU.AUTHORIZED_USER:
         
         # If user is not logged in 
         if not model.is_logged_in:
             return False
-        
-        # If neede perm is admin and user is not admin
-        if needed_permission == PU.ADMIN:
-            if not model.is_admin:
-                return False
 
     return True
 
@@ -81,11 +75,10 @@ def _render_template(template_name, model = None, form = None):
 
     # If no model is given we still need to give at least the base (ViewModelBase) so the template knows if user is logged in or not.
     if model is None:
-        model = ViewModelBase()
+        model = BaseVM()
 
     # Getting data for currently logged in (or not) user
     model.is_logged_in = session.get("is_logged_in")
-    model.is_admin = session.get("is_admin")
     model.user_id = session.get("user_id")
 
     # If user has no permission for the view we 'redirect' to the no perm page
@@ -119,7 +112,7 @@ def index():
 def logout():
 
     form = LoginForm()
-    model = LoginVM()
+    model = BaseVM()
     
     try:
 
@@ -135,7 +128,7 @@ def logout():
 def login():
 
     form = LoginForm()
-    model = LoginVM()
+    model = BaseVM()
     return _render_template('login.html', model=model, form=form)
     
 
@@ -143,7 +136,7 @@ def login():
 def login_submit():
 
     form = LoginForm()
-    model = LoginVM()
+    model = BaseVM()
 
     if form.validate_on_submit(): 
 
@@ -160,14 +153,14 @@ def login_submit():
 def register():
 
     form = RegisterForm()
-    model = RegisterVM()
+    model = BaseVM()
     return _render_template('register.html', model=model, form=form)
 
 @app.route("/login/register_submit", methods=["POST", "GET"])
 def register_submit():
 
     form = RegisterForm()
-    model = RegisterVM()
+    model = BaseVM()
 
     # If the form is valid we get the given data and attempt to register the user.
     if form.validate_on_submit():
@@ -312,6 +305,24 @@ def my_reservations():
     model.grouped_bungalows = ReservationHelper().GetGroupedReservations()
     return _render_template('myReservations.html', model=model)
 
+# USED INTERNAL ONLY
+def _redirect_to_my_reservations_with_message(message_type, message):
+
+    # Loading all reservations for the logged in user from the database.
+    reservations = Reservation.query.filter(Reservation.user_id == session["user_id"]).all()
+    model = MyReservationVM()
+
+    model = _add_message(model, message_type, message)
+
+    # If the user has no reservation we send a message informing them
+    if len(reservations) == 0:
+
+        model = _add_message(model, MessageType.INFO, "You have no reservations")
+        return _render_template('myReservations.html', model=model)
+
+    model.grouped_bungalows = ReservationHelper().GetGroupedReservations()
+    return _render_template('myReservations.html', model=model)
+
 @app.route("/my_reservations/cancel/<reservation_id>")
 def cancel(reservation_id):
 
@@ -395,10 +406,7 @@ def change_type(reservation_id):
     
     # If we cant find a reservation with that id we just go back to the my reservation page with a fitting error message
     if reservation == None:
-
-        model.grouped_bungalows = ReservationHelper().GetGroupedReservations()
-        model = _add_message(model, MessageType.ERROR, "Failed loading template, reservation not found for id " + str(reservation_id))
-        return _render_template('myReservations.html', model=model)
+        return _redirect_to_my_reservations_with_message(MessageType.ERROR, "Failed loading template, reservation not found for id " + str(reservation_id))
 
     model.bungalow = reservation.bungalow
     model.reservation = reservation
@@ -422,24 +430,82 @@ def change_type_confirm(reservation_id, bungalow_id):
     reservation.bungalow_id = bungalow_id
     db.session.commit()
 
-    model = MyReservationVM()
+    return _redirect_to_my_reservations_with_message(MessageType.SUCCESS, "Reservation type changed")
 
-    # Rendering the my reservations view with a message saying the reservation type changed
-    model.grouped_bungalows = ReservationHelper().GetGroupedReservations()
-    model = _add_message(model, MessageType.SUCCESS, "Reservation type changed")
-    return _render_template('myReservations.html', model=model)
+@app.route("/my_reservations/change_week/<reservation_id>") 
+def change_week(reservation_id):
 
-@app.route("/admin", methods=["POST", "GET"])
-def admin():
+    model = ChangeWeekVM()
+    form = ChangeWeekForm()
+    reservation_id_is_valid = reservation_id != None or reservation_id != ""
 
-    model = AdminVM()
-    return _render_template('admin.html', model=model)
+    if not reservation_id_is_valid:
+        return _redirect_to_my_reservations_with_message(MessageType.ERROR, "Given reservation id for change_week not valid")
+
+    reservation = Reservation.query.where(Reservation.id == reservation_id).first()
+
+    if reservation == None:
+        return _redirect_to_my_reservations_with_message(MessageType.ERROR, "Reservation not found in database")
+
+    form.reservation_id.data = reservation_id
+    model.reservation = reservation
+    return _render_template("changeWeek.html", model=model, form=form)
+
+@app.route("/my_reservations/change_week/confirm", methods=["POST", "GET"])
+def change_week_submit():
+
+    model = ChangeWeekVM()
+    form = ChangeWeekForm()
+    reservation_id = form.data.get("reservation_id")
+    date = form.data.get("date")
+    reservation_id_is_valid = reservation_id != None or reservation_id != ""
+    date_is_valid = date != None or date != ""
+
+    # if valid reservation_id or date was given we want to make sure those are still filled in.
+    if reservation_id_is_valid:
+        form.reservation_id.data = reservation_id
+
+    if (date_is_valid):
+        form.date.data = date
+
+    # If form invalid, date invalid or reservation invalid returning a view with a error message.
+    if not form.validate_on_submit() or not reservation_id_is_valid or not date_is_valid:
+
+        model = _add_message(model, MessageType.ERROR, "Error changing week number for reservation")        
+        return _render_template('changeWeek.html', model=model, form=form)
+
+    # Getting the weeknumber for the reservation
+    week_number = ReservationHelper().GetWeekNumber(date)
+    reservation = Reservation.query.where(Reservation.id == reservation_id).first()
+
+    if (reservation == None):
+
+        model = _add_message(model, MessageType.ERROR, "Reservation not found in database")
+        return _render_template('changeWeek.html', model=model, form=form)
+
+    # Checking if bungalow is not already reserved on that week.
+    alreadyReserved = db.session.query(func.count(Reservation.id)) \
+        .where(Reservation.bungalow_id == reservation.bungalow_id) \
+        .where(Reservation.reserveration_week_number == week_number) \
+        .first()[0] > 0
+
+    # If already reserved rendering the view with a error message.
+    if alreadyReserved:
+
+        model.reservation = reservation
+        model = _add_message(model, MessageType.ERROR, "Selected week is already reserved by someone else.")
+        return _render_template('changeWeek.html', model=model, form=form)
+
+    # Updating week number for reservation and commiting it to the db
+    reservation.reserveration_week_number = week_number
+    db.session.commit()
+
+    return _redirect_to_my_reservations_with_message(MessageType.SUCCESS, "Reservation week changed succesfully")
 
 # Error routes
 @app.route("/no_permission") 
 def no_permission():
     return _render_template("noPermission.html")
-
 
 @app.errorhandler(404)
 def page_not_found(e):

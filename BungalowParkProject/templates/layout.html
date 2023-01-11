@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <!--
     Every document will be extending this page, consider this the base page / layout page
-    This also means that every model will always need .is_admin and .is_logged_in, hence we made ViewModelBase
 -->
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -40,13 +39,6 @@
             </li>
 
             {% if model.is_logged_in %}
-
-                {% if model.is_admin %}
-                    <li class="nav-item mr-3">
-                        <a class="navbar-btn btn btn-outline-info" href="{{ url_for('admin') }}"><i class="fas fa-user-shield"> Admin functions</i></a>
-                    </li>
-                {% endif %}
-
                 <li class="nav-item mr-3">
                     <a class="navbar-btn btn btn-outline-info" href="{{ url_for('my_reservations') }}"><i class="fas fa-receipt"> My reservations</i></a>
                 </li>

@@ -65,7 +65,6 @@
     <Content Include="static\css\style.css" />
     <Content Include="requirements.txt" />
     <Content Include="static\img\logo.png" />
-    <Content Include="templates\adminFunctions.html" />
     <Content Include="templates\error.html" />
     <Content Include="templates\index.html" />
     <Content Include="templates\layout.html" />
